@@ -1,9 +1,6 @@
 package a
 
-//import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.sql._
-
-import scala.util.Try
 
 // Must be at top level, else will get a type tag not found which fails implicit case class Encoder derivation!
 case class BeardLengths(id: Int, name: Option[String], age: Option[Int], beardLengthCm: Option[Int])
@@ -48,14 +45,12 @@ object BeardLengths {
 //      }.collect().toList
       val largest: List[BeardLengths] = filteredDataSet.filter("beardLengthCm IS NOT null AND name IS NOT NULL").sort(desc("beardLengthCm")).collect().toList
 
-
       // Print filtered-out rows
       println(logDataSet.count() + ", " + filteredDataSet.count())
 
       // Print result
       println(largest.mkString("\n"))
     }
-
 
     spark.stop()
   }
