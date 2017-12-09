@@ -166,6 +166,16 @@ case class StackOverflow(
   ExpectedSalary: String
 )
 
+case class StackOverflowSubset(
+  CareerSatisfaction: Option[String],
+  DeveloperType: Option[String],
+  Gender: Option[String],
+  HoursPerWeek: Option[String],
+  JobSatisfaction: Option[String],
+  JobSecurity: Option[String],
+  IDE: Option[String],
+  WantWorkLanguage: Option[String]
+)
 
 object StackOverflow {
   def main(args: Array[String]): Unit = {
@@ -184,51 +194,58 @@ object StackOverflow {
       import spark.implicits._
 
       // Must have case class at top level, else will get a type tag not found which fails implicit case class Encoder derivation!
-      val logDataSet: Dataset[StackOverflow] = spark.read
+      val logDataSet: Dataset[StackOverflowSubset] = spark.read
         .schema(implicitly[Encoder[StackOverflow]].schema)
         .format("csv")
         .option("header", "true")
         .option("inferSchema", "true")
         .option("mode", "DROPMALFORMED")
         .load(logFile)
-        .as[StackOverflow]
+        .select("CareerSatisfaction", "DeveloperType", "Gender", "HoursPerWeek", "JobSatisfaction", "JobSecurity", "IDE", "WantWorkLanguage")
+        .as[StackOverflowSubset]
         .cache()
 
-      val filteredDataSet =
-        logDataSet.cache()
+      val filteredDataSet = logDataSet.cache()
 
       import org.apache.spark.sql.functions._
-//      val largest: List[BeardLengthsProper] = filteredDataSet.sort(desc("beardLengthCm")).rdd.collect {
-//        case BeardLengths(id, Some(name), Some(length), Some(age)) => BeardLengthsProper(id, name, length, age)
-//      }.collect().toList
-
 
       val uniques: immutable.Seq[(String, String)] = List(
         ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
-        ("AssessJobExp", filteredDataSet.map(_.AssessJobExp).distinct().take(30).toList.toString),
-        ("BuildingThings", filteredDataSet.map(_.BuildingThings).distinct().take(30).toList.toString),
-        ("ChallengeMyself", filteredDataSet.map(_.ChallengeMyself).distinct().take(30).toList.toString),
-        ("ChangeWorld", filteredDataSet.map(_.ChangeWorld).distinct().take(30).toList.toString),
-        ("CompanySize", filteredDataSet.map(_.CompanySize).distinct().take(30).toList.toString),
-        ("CompanyType", filteredDataSet.map(_.CompanyType).distinct().take(30).toList.toString),
-        ("CompetePeers", filteredDataSet.map(_.CompetePeers).distinct().take(30).toList.toString),
         ("DeveloperType", filteredDataSet.map(_.DeveloperType).distinct().take(30).toList.toString),
-        ("DiversityImportant", filteredDataSet.map(_.DiversityImportant).distinct().take(30).toList.toString),
-        ("EducationImportant", filteredDataSet.map(_.EducationImportant).distinct().take(30).toList.toString),
-        ("EducationTypes", filteredDataSet.map(_.EducationTypes).distinct().take(30).toList.toString),
-        ("EmploymentStatus", filteredDataSet.map(_.EmploymentStatus).distinct().take(30).toList.toString),
-        ("EnjoyDebugging", filteredDataSet.map(_.EnjoyDebugging).distinct().take(30).toList.toString),
         ("Gender", filteredDataSet.map(_.Gender).distinct().take(30).toList.toString),
-        ("HaveWorkedDatabase", filteredDataSet.map(_.HaveWorkedDatabase).distinct().take(30).toList.toString),
-        ("HaveWorkedLanguage", filteredDataSet.map(_.HaveWorkedLanguage).distinct().take(30).toList.toString),
-        ("HaveWorkedPlatform", filteredDataSet.map(_.HaveWorkedPlatform).distinct().take(30).toList.toString),
-        ("HaveWorkedFramework", filteredDataSet.map(_.HaveWorkedFramework).distinct().take(30).toList.toString),
         ("HoursPerWeek", filteredDataSet.map(_.HoursPerWeek).distinct().take(30).toList.toString),
         ("JobSatisfaction", filteredDataSet.map(_.JobSatisfaction).distinct().take(30).toList.toString),
         ("JobSecurity", filteredDataSet.map(_.JobSecurity).distinct().take(30).toList.toString),
         ("IDE", filteredDataSet.map(_.IDE).distinct().take(30).toList.toString),
         ("WantWorkLanguage", filteredDataSet.map(_.WantWorkLanguage).distinct().take(30).toList.toString)
       )
+
+      //      val uniques: immutable.Seq[(String, String)] = List(
+//        ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
+//        ("AssessJobExp", filteredDataSet.map(_.AssessJobExp).distinct().take(30).toList.toString),
+//        ("BuildingThings", filteredDataSet.map(_.BuildingThings).distinct().take(30).toList.toString),
+//        ("ChallengeMyself", filteredDataSet.map(_.ChallengeMyself).distinct().take(30).toList.toString),
+//        ("ChangeWorld", filteredDataSet.map(_.ChangeWorld).distinct().take(30).toList.toString),
+//        ("CompanySize", filteredDataSet.map(_.CompanySize).distinct().take(30).toList.toString),
+//        ("CompanyType", filteredDataSet.map(_.CompanyType).distinct().take(30).toList.toString),
+//        ("CompetePeers", filteredDataSet.map(_.CompetePeers).distinct().take(30).toList.toString),
+//        ("DeveloperType", filteredDataSet.map(_.DeveloperType).distinct().take(30).toList.toString),
+//        ("DiversityImportant", filteredDataSet.map(_.DiversityImportant).distinct().take(30).toList.toString),
+//        ("EducationImportant", filteredDataSet.map(_.EducationImportant).distinct().take(30).toList.toString),
+//        ("EducationTypes", filteredDataSet.map(_.EducationTypes).distinct().take(30).toList.toString),
+//        ("EmploymentStatus", filteredDataSet.map(_.EmploymentStatus).distinct().take(30).toList.toString),
+//        ("EnjoyDebugging", filteredDataSet.map(_.EnjoyDebugging).distinct().take(30).toList.toString),
+//        ("Gender", filteredDataSet.map(_.Gender).distinct().take(30).toList.toString),
+//        ("HaveWorkedDatabase", filteredDataSet.map(_.HaveWorkedDatabase).distinct().take(30).toList.toString),
+//        ("HaveWorkedLanguage", filteredDataSet.map(_.HaveWorkedLanguage).distinct().take(30).toList.toString),
+//        ("HaveWorkedPlatform", filteredDataSet.map(_.HaveWorkedPlatform).distinct().take(30).toList.toString),
+//        ("HaveWorkedFramework", filteredDataSet.map(_.HaveWorkedFramework).distinct().take(30).toList.toString),
+//        ("HoursPerWeek", filteredDataSet.map(_.HoursPerWeek).distinct().take(30).toList.toString),
+//        ("JobSatisfaction", filteredDataSet.map(_.JobSatisfaction).distinct().take(30).toList.toString),
+//        ("JobSecurity", filteredDataSet.map(_.JobSecurity).distinct().take(30).toList.toString),
+//        ("IDE", filteredDataSet.map(_.IDE).distinct().take(30).toList.toString),
+//        ("WantWorkLanguage", filteredDataSet.map(_.WantWorkLanguage).distinct().take(30).toList.toString)
+//      )
 
       println(uniques.map((v: (String, String)) => s"${v._1}: ${v._2}").mkString("\n"))
 //
