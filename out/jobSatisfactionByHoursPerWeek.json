@@ -1,0 +1,86 @@
+[
+  {
+    "hoursPerWeek" : 0,
+    "jobSatisfactionMean" : 6.7229437229437226,
+    "jobSatisfactionStdDev" : 2.2556869177109142,
+    "jobSatisfactionTotal" : 231
+  },
+  {
+    "hoursPerWeek" : 1,
+    "jobSatisfactionMean" : 6.359872611464968,
+    "jobSatisfactionStdDev" : 2.1673841323887513,
+    "jobSatisfactionTotal" : 314
+  },
+  {
+    "hoursPerWeek" : 2,
+    "jobSatisfactionMean" : 5.721311475409836,
+    "jobSatisfactionStdDev" : 2.2638910455643115,
+    "jobSatisfactionTotal" : 183
+  },
+  {
+    "hoursPerWeek" : 3,
+    "jobSatisfactionMean" : 5.820224719101123,
+    "jobSatisfactionStdDev" : 2.635258300919255,
+    "jobSatisfactionTotal" : 89
+  },
+  {
+    "hoursPerWeek" : 4,
+    "jobSatisfactionMean" : 5.329545454545454,
+    "jobSatisfactionStdDev" : 2.3129897600495433,
+    "jobSatisfactionTotal" : 88
+  },
+  {
+    "hoursPerWeek" : 5,
+    "jobSatisfactionMean" : 6.580645161290323,
+    "jobSatisfactionStdDev" : 1.98806592806186,
+    "jobSatisfactionTotal" : 62
+  },
+  {
+    "hoursPerWeek" : 6,
+    "jobSatisfactionMean" : 6.235294117647059,
+    "jobSatisfactionStdDev" : 2.2300811716360376,
+    "jobSatisfactionTotal" : 34
+  },
+  {
+    "hoursPerWeek" : 7,
+    "jobSatisfactionMean" : 5.896551724137931,
+    "jobSatisfactionStdDev" : 1.819435304589368,
+    "jobSatisfactionTotal" : 29
+  },
+  {
+    "hoursPerWeek" : 8,
+    "jobSatisfactionMean" : 5.620689655172414,
+    "jobSatisfactionStdDev" : 2.717848323102149,
+    "jobSatisfactionTotal" : 29
+  },
+  {
+    "hoursPerWeek" : 9,
+    "jobSatisfactionMean" : 4.833333333333333,
+    "jobSatisfactionStdDev" : 1.7494587907710375,
+    "jobSatisfactionTotal" : 12
+  },
+  {
+    "hoursPerWeek" : 1e1,
+    "jobSatisfactionMean" : 5.673076923076923,
+    "jobSatisfactionStdDev" : 2.3822970777205428,
+    "jobSatisfactionTotal" : 52
+  },
+  {
+    "hoursPerWeek" : 12,
+    "jobSatisfactionMean" : 4.153846153846154,
+    "jobSatisfactionStdDev" : 2.409915415049314,
+    "jobSatisfactionTotal" : 13
+  },
+  {
+    "hoursPerWeek" : 2e1,
+    "jobSatisfactionMean" : 5.4,
+    "jobSatisfactionStdDev" : 3.1187041843486347,
+    "jobSatisfactionTotal" : 2e1
+  },
+  {
+    "hoursPerWeek" : 4e1,
+    "jobSatisfactionMean" : 6.428571428571429,
+    "jobSatisfactionStdDev" : 2.433531985012304,
+    "jobSatisfactionTotal" : 56
+  }
+]

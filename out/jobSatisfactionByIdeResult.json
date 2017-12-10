@@ -1,0 +1,104 @@
+[
+  {
+    "ide" : "Vim",
+    "jobSatisfactionMean" : 5.657407407407407,
+    "jobSatisfactionStdDev" : 2.427217900307425,
+    "jobSatisfactionTotal" : 216
+  },
+  {
+    "ide" : "PyCharm",
+    "jobSatisfactionMean" : 5.705882352941177,
+    "jobSatisfactionStdDev" : 2.5040792005583627,
+    "jobSatisfactionTotal" : 68
+  },
+  {
+    "ide" : "PHPStorm",
+    "jobSatisfactionMean" : 5.827586206896552,
+    "jobSatisfactionStdDev" : 2.3536557243243426,
+    "jobSatisfactionTotal" : 87
+  },
+  {
+    "ide" : "Atom",
+    "jobSatisfactionMean" : 5.89375,
+    "jobSatisfactionStdDev" : 2.3407703806317195,
+    "jobSatisfactionTotal" : 16e1
+  },
+  {
+    "ide" : "RStudio",
+    "jobSatisfactionMean" : 5.916666666666667,
+    "jobSatisfactionStdDev" : 3.063340981839027,
+    "jobSatisfactionTotal" : 24
+  },
+  {
+    "ide" : "Notepad++",
+    "jobSatisfactionMean" : 5.945812807881773,
+    "jobSatisfactionStdDev" : 2.334289688547196,
+    "jobSatisfactionTotal" : 406
+  },
+  {
+    "ide" : "Eclipse",
+    "jobSatisfactionMean" : 5.9825174825174825,
+    "jobSatisfactionStdDev" : 2.3774618541870116,
+    "jobSatisfactionTotal" : 286
+  },
+  {
+    "ide" : "Emacs",
+    "jobSatisfactionMean" : 6.0,
+    "jobSatisfactionStdDev" : 2.5495097567963922,
+    "jobSatisfactionTotal" : 45
+  },
+  {
+    "ide" : "Sublime Text",
+    "jobSatisfactionMean" : 6.003205128205129,
+    "jobSatisfactionStdDev" : 2.2759731990520446,
+    "jobSatisfactionTotal" : 312
+  },
+  {
+    "ide" : "IPython / Jupyter",
+    "jobSatisfactionMean" : 6.071428571428571,
+    "jobSatisfactionStdDev" : 2.69952893038638,
+    "jobSatisfactionTotal" : 42
+  },
+  {
+    "ide" : "Visual Studio",
+    "jobSatisfactionMean" : 6.096774193548387,
+    "jobSatisfactionStdDev" : 2.4116067601652875,
+    "jobSatisfactionTotal" : 31e1
+  },
+  {
+    "ide" : "Xcode",
+    "jobSatisfactionMean" : 6.153061224489796,
+    "jobSatisfactionStdDev" : 2.2399928240695375,
+    "jobSatisfactionTotal" : 98
+  },
+  {
+    "ide" : "Android Studio",
+    "jobSatisfactionMean" : 6.168949771689498,
+    "jobSatisfactionStdDev" : 2.2895342846493496,
+    "jobSatisfactionTotal" : 219
+  },
+  {
+    "ide" : "NetBeans",
+    "jobSatisfactionMean" : 6.1838235294117645,
+    "jobSatisfactionStdDev" : 1.9896108157770651,
+    "jobSatisfactionTotal" : 136
+  },
+  {
+    "ide" : "NA",
+    "jobSatisfactionMean" : 6.1902017291066285,
+    "jobSatisfactionStdDev" : 2.4679721180298464,
+    "jobSatisfactionTotal" : 347
+  },
+  {
+    "ide" : "IntelliJ",
+    "jobSatisfactionMean" : 6.203592814371257,
+    "jobSatisfactionStdDev" : 2.2748995003770003,
+    "jobSatisfactionTotal" : 167
+  },
+  {
+    "ide" : "Visual Studio Code",
+    "jobSatisfactionMean" : 6.3202614379084965,
+    "jobSatisfactionStdDev" : 2.3273363891029275,
+    "jobSatisfactionTotal" : 153
+  }
+]

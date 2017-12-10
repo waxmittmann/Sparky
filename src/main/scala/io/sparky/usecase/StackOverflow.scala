@@ -65,7 +65,7 @@ case class StackOverflow(
   CompetePeers: String,
   ChangeWorld: String,
   JobSeekingStatus: String,
-  HoursPerWeek: String,
+  HoursPerWeek: Int,
   LastNewJob: String,
   AssessJobIndustry: String,
   AssessJobRole: String,
@@ -178,7 +178,7 @@ case class StackOverflowSubset(
   CareerSatisfaction: Int,
   DeveloperType: Option[String],
   Gender: Option[String],
-  HoursPerWeek: String,
+  HoursPerWeek: Int,
   JobSatisfaction: Int,
   JobSecurity: Option[String],
   IDE: Option[String],
@@ -186,7 +186,7 @@ case class StackOverflowSubset(
 )
 
 case class JobSatisfactionByHoursPerWeek(
-  hoursPerWeek: String,
+  hoursPerWeek: BigInt,
   jobSatisfactionMean: Double,
   jobSatisfactionStdDev: Double,
   jobSatisfactionTotal: BigInt
@@ -320,7 +320,7 @@ object StackOverflow {
         count("JobSatisfaction")
       )
       .filter("count(JobSatisfaction) >= 10")
-      .sort($"avg(JobSatisfaction)")
+      .sort($"HoursPerWeek")
       .cache()
 
     val byHoursJson = jobSatisfactionByHoursPerWeek

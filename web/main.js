@@ -37,7 +37,7 @@ var jobSatisfactionByIde = c3.generate(
                 type: 'category' // this needed to load string x value
             },
             y: {
-                min: 6
+                min: 5.5
             }
         }
     }
@@ -70,7 +70,7 @@ var jobSatisfactionByGender = c3.generate(
                 type: 'category' // this needed to load string x value
             },
             y: {
-                min: 5.8
+                min: 5
             }
         }
     }

@@ -1,0 +1,14 @@
+[
+  {
+    "gender" : "Female",
+    "jobSatisfactionMean" : 5.602941176470588,
+    "jobSatisfactionStdDev" : 2.0957647831612434,
+    "jobSatisfactionTotal" : 68
+  },
+  {
+    "gender" : "Male",
+    "jobSatisfactionMean" : 6.136653895274585,
+    "jobSatisfactionStdDev" : 2.311535077792237,
+    "jobSatisfactionTotal" : 783
+  }
+]
