@@ -1,0 +1,60 @@
+<html>
+<head>
+
+</head>
+
+<body>
+<div id="app">
+    {{ message }}
+</div>
+
+<div class="chart" id="chart"></div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!-- Load c3.css -->
+<!-- <link href="/path/to/c3.css" rel="stylesheet"> -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.18/c3.css" rel="stylesheet">
+
+<!-- Load d3.js and c3.js -->
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.0/d3.js" charset="utf-8"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js" charset="utf-8"></script>
+<!-- <script src="/path/to/d3.v3.min.js" charset="utf-8"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.18/c3.js"></script>
+<!-- <script src="/path/to/c3.min.js"></script> -->
+<script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue!'
+      }
+    })
+
+    var chart = c3.generate({
+    data: {
+        columns: [
+            ['Peters per Pan', 30, 200, 100, 400, 150, 250],
+            // ['data2', 130, 100, 140, 200, 150, 50]
+        ],
+        type: 'bar'
+    },
+    bar: {
+        width: {
+            // ratio: 0.5 // this makes bar width 50% of length between ticks
+            ratio: 0.85 // this makes bar width 50% of length between ticks
+        }
+            // or
+            //width: 100 // this makes bar width 100px
+        }
+    });
+
+    // setTimeout(function () {
+    //     chart.load({
+    //         columns: [
+    //             ['data3', 130, -150, 200, 300, -200, 100]
+    //         ]
+    //     });
+    // }, 1000);
+  </script>
+</html>
