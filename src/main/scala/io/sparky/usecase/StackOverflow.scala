@@ -182,7 +182,8 @@ case class StackOverflowSubset(
   JobSatisfaction: Int,
   JobSecurity: Option[String],
   IDE: Option[String],
-  WantWorkLanguage: Option[String]
+  WantWorkLanguage: Option[String],
+  Overpaid: String
 )
 
 case class JobSatisfactionByHoursPerWeek(
@@ -206,10 +207,16 @@ case class JobSatisfactionByGender(
   jobSatisfactionTotal: BigInt
 )
 
+case class Overpaid(
+  overpaid: String,
+  count: Long
+)
+
 object StackOverflow {
   implicit val jobSatisfactionByIDEEncoder = deriveEncoder[JobSatisfactionByIDE]
   implicit val jobSatisfactionByHoursPerWeekEncoder = deriveEncoder[JobSatisfactionByHoursPerWeek]
   implicit val jobSatisfactionByGenderEncoder = deriveEncoder[JobSatisfactionByGender]
+  implicit val overpaidEncoder = deriveEncoder[Overpaid]
 
   val logFile = "/home/damxam/Workspaces/Datasets/survey_results_public.csv"
 
@@ -227,8 +234,9 @@ object StackOverflow {
 
   def run(implicit spark: SparkSession) = {
     val logDataSet = base(logFile)
-    general(logDataSet)
-    jobSatisfaction(logDataSet)
+//    general(logDataSet)
+//    jobSatisfaction(logDataSet)
+    overpaid(logDataSet)
   }
 
   def base(path: String)(implicit spark: SparkSession): DataFrame = {
@@ -249,7 +257,7 @@ object StackOverflow {
     import spark.implicits._
 
     val filteredDataSet: Dataset[StackOverflowSubset] = logDataSet
-      .select("CareerSatisfaction", "DeveloperType", "Gender", "HoursPerWeek", "JobSatisfaction", "JobSecurity", "IDE", "WantWorkLanguage")
+      .select("CareerSatisfaction", "DeveloperType", "Gender", "HoursPerWeek", "JobSatisfaction", "JobSecurity", "IDE", "WantWorkLanguage", "Overpaid")
       .as[StackOverflowSubset]
       .cache()
 
@@ -258,6 +266,7 @@ object StackOverflow {
     val hoursPerWeekCount = countValid(logDataSet, $"HoursPerWeek", Some("NA"))
 
     val uniques: immutable.Seq[(String, String)] = List(
+      ("Overpaid", filteredDataSet.map(_.Overpaid).distinct().take(30).toList.toString),
       ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
       ("DeveloperType", filteredDataSet.map(_.DeveloperType).distinct().take(30).toList.toString),
       ("Gender", filteredDataSet.map(_.Gender).distinct().take(30).toList.toString),
@@ -277,6 +286,25 @@ object StackOverflow {
     write(
       "./out/results.txt",
       (counts ++ uniques.map(v => s"${v._1}: ${v._2}")).mkString("\n")
+    )
+  }
+
+  def overpaid(logDataSet: DataFrame)(implicit spark: SparkSession) = {
+    //"Neither underpaid nor overpaid, Greatly overpaid, NA, Somewhat overpaid, Somewhat underpaid, Greatly underpaid"
+
+    import spark.implicits._
+
+    val overpaid =
+      logDataSet
+        .filter(not($"Overpaid".isin("NA")))
+        .select("Overpaid")
+        .groupBy("Overpaid")
+        .count()
+        .as[Overpaid]
+
+    write(
+      "./out/overpaid.txt",
+      overpaid.collect().toList.asJson.spaces2
     )
   }
 
@@ -355,7 +383,6 @@ object StackOverflow {
       )
       .as[JobSatisfactionByGender]
       .collect().toList.asJson
-
 
     // Write
     write("./out/jobSatisfactionByHoursPerWeek.json", byHoursJson.spaces2)

@@ -1,7 +1,7 @@
 import ideData from '../out/jobSatisfactionByIdeResult.json';
 import hoursData from '../out/jobSatisfactionByHoursPerWeek.json';
 import genderData from '../out/jobSatisfactionByGender.json';
-
+import overpaidData from '../out/overpaid.json';
 
 var app = new Vue({
   el: '#app',
@@ -108,3 +108,14 @@ var jobSatisfactionByHours = c3.generate(
         }
     }
 );
+
+var overpaid = c3.generate({
+    bindto: "#overpaid",
+    data: {
+        columns: overpaidData.map(x => [x.overpaid, x.count]),
+        type : 'pie',
+        onclick: function (d, i) { console.log("onclick", d, i); },
+        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    }
+});

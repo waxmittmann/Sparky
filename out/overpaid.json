@@ -1,0 +1,22 @@
+[
+  {
+    "overpaid" : "Neither underpaid nor overpaid",
+    "count" : 93
+  },
+  {
+    "overpaid" : "Greatly overpaid",
+    "count" : 5
+  },
+  {
+    "overpaid" : "Somewhat overpaid",
+    "count" : 21
+  },
+  {
+    "overpaid" : "Somewhat underpaid",
+    "count" : 160
+  },
+  {
+    "overpaid" : "Greatly underpaid",
+    "count" : 62
+  }
+]

@@ -75,6 +75,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__out_jobSatisfactionByHoursPerWeek_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__out_jobSatisfactionByHoursPerWeek_json__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__out_jobSatisfactionByGender_json__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__out_jobSatisfactionByGender_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__out_jobSatisfactionByGender_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__out_overpaid_json__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__out_overpaid_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__out_overpaid_json__);
 
 
 
@@ -186,6 +188,16 @@ var jobSatisfactionByHours = c3.generate(
     }
 );
 
+var overpaid = c3.generate({
+    bindto: "#overpaid",
+    data: {
+        columns: __WEBPACK_IMPORTED_MODULE_3__out_overpaid_json___default.a.map(x => [x.overpaid, x.count]),
+        type : 'pie',
+        onclick: function (d, i) { console.log("onclick", d, i); },
+        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    }
+});
 
 /***/ }),
 /* 1 */
@@ -204,6 +216,12 @@ module.exports = [{"hoursPerWeek":0,"jobSatisfactionMean":6.7229437229437226,"jo
 /***/ (function(module, exports) {
 
 module.exports = [{"gender":"Female","jobSatisfactionMean":5.602941176470588,"jobSatisfactionStdDev":2.0957647831612434,"jobSatisfactionTotal":68},{"gender":"Male","jobSatisfactionMean":6.136653895274585,"jobSatisfactionStdDev":2.311535077792237,"jobSatisfactionTotal":783}]
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = [{"overpaid":"Neither underpaid nor overpaid","count":93},{"overpaid":"Greatly overpaid","count":5},{"overpaid":"Somewhat overpaid","count":21},{"overpaid":"Somewhat underpaid","count":160},{"overpaid":"Greatly underpaid","count":62}]
 
 /***/ })
 /******/ ]);
