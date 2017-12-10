@@ -1,8 +1,13 @@
 package a
 
-import java.nio.charset.Charset
+import java.io.PrintWriter
+import java.nio.charset.{Charset, StandardCharsets}
 import java.nio.file.{FileSystem, FileSystems, Files}
 
+import io.circe.{Encoder => CirceEncoder, _}
+import io.circe.syntax._
+import io.circe.generic.JsonCodec
+import io.circe.generic.semiauto._
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
@@ -180,7 +185,18 @@ case class StackOverflowSubset(
   WantWorkLanguage: Option[String]
 )
 
+//@JsonCodec
+case class JobSatisfactionByHoursPerWeek(
+  hoursPerWeek: String,
+  jobSatisfactionMean: Double,
+  jobSatisfactionStdDev: Double,
+  jobSatisfactionTotal: BigInt
+)
+
+
 object StackOverflow {
+  implicit val jobSatisfactionByHoursPerWeekEncoder = deriveEncoder[JobSatisfactionByHoursPerWeek]
+
   def main(args: Array[String]): Unit = {
 
     val logFile = "/home/damxam/Workspaces/Datasets/survey_results_public.csv"
@@ -190,7 +206,6 @@ object StackOverflow {
       .master("local")
       .appName("Stack Overflow")
       .getOrCreate()
-
 
     // With .as[] we get a dataset
     {
@@ -204,7 +219,7 @@ object StackOverflow {
         .option("inferSchema", "true")
         .option("mode", "DROPMALFORMED")
         .load(logFile)
-        .withColumn("IDE", split($"IDE", ";"))g
+        .withColumn("IDE", split($"IDE", ";"))
         .cache()
 
       val filteredDataSet: Dataset[StackOverflowSubset] = logDataSet
@@ -232,6 +247,7 @@ object StackOverflow {
         )
         .filter("count(JobSatisfaction) >= 10")
         .sort($"avg(JobSatisfaction)")
+        .cache()
 
       val jobSatisfactionCount = logDataSet
         .filter(not(isnull($"JobSatisfaction")))
@@ -272,8 +288,29 @@ object StackOverflow {
         Charset.defaultCharset()
       )
 
+      val csbwJson = careerSatisfactionByHoursPerWeek
+        .select(
+          $"HoursPerWeek".as("hoursPerWeek"),
+          $"avg(JobSatisfaction)".as("jobSatisfactionMean"),
+          $"stddev_samp(JobSatisfaction)".as("jobSatisfactionStdDev"),
+          $"count(JobSatisfaction)".as("jobSatisfactionTotal")
+        )
+        .as[JobSatisfactionByHoursPerWeek]
+        .collect().toList.asJson
 
-      println("Done (check results.txt)")
+      implicitly[CirceEncoder[BigInt]]
+
+      Files.write(
+        FileSystems.getDefault.getPath("./careerSatisfactionByHoursPerWeek.json"),
+        csbwJson.spaces2.getBytes(StandardCharsets.UTF_8)
+      )
+
+//      new PrintWriter("./careerSatisfactionByHoursPerWeek.json") { write(csbwJson.spaces2); close() }
+
+//      careerSatisfactionByHoursPerWeek.write.json("./satisfactionByHoursPerWeek.json")
+//      careerSatisfactionByHoursPerWeek.write.json("./satisfactionByHoursPerWeek.json")
+//      careerSatisfactionByHoursPerWeek.write.format("org.apache.spark.sql.json").mode(SaveMode.Append).save("./satisfactionByHoursPerWeek.json")
+//      careerSatisfactionByHoursPerWeek.write.format("org.apache.spark.sql.json").mode(SaveMode.Append).bucketBy(1, "HoursPerWeek").save("./satisfactionByHoursPerWeek")
     }
 
     spark.stop()

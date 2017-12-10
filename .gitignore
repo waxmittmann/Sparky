@@ -3,4 +3,4 @@ target
 spark-warehouse
 metastore_db
 results.txt
-
+out
