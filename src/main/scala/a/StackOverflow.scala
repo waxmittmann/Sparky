@@ -208,14 +208,9 @@ object StackOverflow {
         .option("inferSchema", "true")
         .option("mode", "DROPMALFORMED")
         .load(logFile)
-        //ta.withColumn("D", split($"A", "\\.")(0)).show(false)
-//        .withColumn("IDE", split($"IDE", ";")(0)) //.show(false)
         .withColumn("IDE", split($"IDE", ";")) //.show(false)
+//        .withColumn("IDE", expr()$"IDE")
         .cache()
-//        .filter($"CareerSatisfaction".
-//        .withColumn("HoursPerWeek", map($"HoursPerWeek"))
-//        .withColumn("HoursPerWeek", format_number($"HoursPerWeek", 0))
-
 
       val filteredDataSet: Dataset[StackOverflowSubset] = logDataSet
         .select("CareerSatisfaction", "DeveloperType", "Gender", "HoursPerWeek", "JobSatisfaction", "JobSecurity", "IDE", "WantWorkLanguage")
@@ -224,8 +219,12 @@ object StackOverflow {
 
       val careerSatisfactionByIde: DataFrame = logDataSet
           .select(explode($"IDE").as("IDE"), $"CareerSatisfaction", $"JobSatisfaction")
+          .withColumn("IDE", trim($"IDE"))
           .groupBy($"IDE")
-          .mean("CareerSatisfaction", "JobSatisfaction")
+//          .mean("CareerSatisfaction", "JobSatisfaction")
+          .agg(mean($"CareerSatisfaction"), mean($"JobSatisfaction"), count($"IDE"))
+          .filter("count(IDE) > 20")
+          .sort($"avg(JobSatisfaction)")
 
 //      val careerSatisfactionByHoursPerWeek: DataFrame = logDataSet
 //        .filter(not(isnull(round($"HoursPerWeek"))))
@@ -250,6 +249,18 @@ object StackOverflow {
         //.mean("JobSatisfaction")
         .sort($"avg(JobSatisfaction)")
 
+      val jobSatisfactionCount = logDataSet
+        .filter(not(isnull($"JobSatisfaction")))
+        .filter(not($"JobSatisfaction".isin("NA")))
+        .count()
+
+      val hoursPerWeekCount = logDataSet
+        .filter(not(isnull($"HoursPerWeek")))
+        .filter(not($"HoursPerWeek".isin("NA")))
+        .count()
+
+      val totalCount = logDataSet.count()
+
       import org.apache.spark.sql.functions._
 
       val uniques: immutable.Seq[(String, String)] = List(
@@ -268,8 +279,14 @@ object StackOverflow {
 
       val careerSatisfactionByHoursWorkedResult = careerSatisfactionByHoursPerWeek.take(50).map(_.mkString(" ")).toList
 
+      val counts = List(
+        s"Total #                 : $totalCount",
+        s"HoursPerWeek #          : $hoursPerWeekCount",
+        s"JobSatisfactionCount #  : $jobSatisfactionCount"
+      )
+
       Files.write(FileSystems.getDefault.getPath("./results.txt"),
-        (careerSatisfactionByHoursWorkedResult ++ careerSatisfactionByIdeResult ++ uniques.map(v => s"${v._1}: ${v._2}")).asJava,
+        (counts ++ careerSatisfactionByHoursWorkedResult ++ careerSatisfactionByIdeResult ++ uniques.map(v => s"${v._1}: ${v._2}")).asJava,
         Charset.defaultCharset()
       )
 
