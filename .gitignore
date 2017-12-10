@@ -3,3 +3,4 @@ target
 spark-warehouse
 metastore_db
 out
+web/node_modules
