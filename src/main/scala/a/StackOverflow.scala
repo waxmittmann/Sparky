@@ -1,9 +1,14 @@
 package a
 
+import java.nio.charset.Charset
+import java.nio.file.{FileSystem, FileSystems, Files}
+
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
 import scala.collection.immutable
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 // Must be at top level, else will get a type tag not found which fails implicit case class Encoder derivation!
 //case class StackOverflow(id: Int, name: Option[String], age: Option[Int], beardLengthCm: Option[Int])
@@ -29,8 +34,8 @@ case class StackOverflow(
   WebDeveloperType: String,
   MobileDeveloperType: String,
   NonDeveloperType: String,
-  CareerSatisfaction: String,
-  JobSatisfaction: String,
+  CareerSatisfaction: Int,
+  JobSatisfaction: Int,
   ExCoderReturn: String,
   ExCoderNotForMe: String,
   ExCoderBalance: String,
@@ -168,11 +173,12 @@ case class StackOverflow(
 )
 
 case class StackOverflowSubset(
-  CareerSatisfaction: Option[String],
+  CareerSatisfaction: Int,
   DeveloperType: Option[String],
   Gender: Option[String],
   HoursPerWeek: String,
-  JobSatisfaction: Option[String],
+//  JobSatisfaction: Option[Int],
+  JobSatisfaction: Int,
   JobSecurity: Option[String],
   IDE: Option[String],
   WantWorkLanguage: Option[String]
@@ -181,7 +187,7 @@ case class StackOverflowSubset(
 object StackOverflow {
   def main(args: Array[String]): Unit = {
 
-    val logFile = "/home/damxam/Workspaces/datasets/survey_results_public.csv"
+    val logFile = "/home/damxam/Workspaces/Datasets/survey_results_public.csv"
 
     val spark = SparkSession
       .builder
@@ -219,12 +225,14 @@ object StackOverflow {
         .as[StackOverflowSubset]
         .cache()
 
-      val answers = logDataSet
+      val answers: DataFrame = logDataSet
           .select(explode($"IDE").as("IDE"), $"CareerSatisfaction")
           //.select(grouping($"IDE"))
           //.select(grouping($"IDE"), mean($"CareerSatisfaction"))
           //.groupBy("IDE")
-          .select("IDE, COUNT(CareerSatisfaction")
+          .groupBy($"IDE")
+          .mean("CareerSatisfaction")
+          //.select($"IDE, COUNT(CareerSatisfaction")
           //.select(mean($"CareerSatisfaction"))
           //.select("IDE", "CareerSatisfaction")
 //        .withColumn("SatisfactionByIDE", expr(""))
@@ -244,6 +252,11 @@ object StackOverflow {
         ("IDE", filteredDataSet.map(_.IDE).distinct().take(30).toList.toString),
         ("WantWorkLanguage", filteredDataSet.map(_.WantWorkLanguage).distinct().take(30).toList.toString)
       )
+
+
+      val answersStr = answers.take(50).map(_.mkString(" ")).toList
+      Files.write(FileSystems.getDefault.getPath("./results.txt"), (answersStr ++ uniques.map(v => s"${v._1}: ${v._2}")).asJava, Charset.defaultCharset())
+
 
       //      val uniques: immutable.Seq[(String, String)] = List(
 //        ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
