@@ -8,39 +8,22 @@
 
   <body>
     <div id="app">
-      {{ message }}
-    </div>
+      <div>
+        <h2>Job Satisfaction by IDE</h2>
+        <div class="chart" id="jobSatisfactionByIde"></div>
+      </div>
 
-    <div>
-      <h2>Job Satisfaction by IDE</h2>
-      <div class="chart" id="jobSatisfactionByIde"></div>
-    </div>
+      <div>
+        <h2>Job Satisfaction by Gender</h2>
+        <div class="chart" id="jobSatisfactionByGender"></div>
+      </div>
 
-    <div>
-      <h2>Job Satisfaction by Gender</h2>
-      <div class="chart" id="jobSatisfactionByGender"></div>
+      <div>
+        <h2>Job Satisfaction by Hours Per Week</h2>
+        <div class="chart" id="jobSatisfactionByHoursPerWeek"></div>
+      </div>
     </div>
-
-    <div>
-      <h2>Job Satisfaction by Hours Per Week</h2>
-      <div class="chart" id="jobSatisfactionByHoursPerWeek"></div>
-    </div>
-
   </body>
 
-  <script>
-    console.log("Hi!")
-
-    var app = new Vue({
-      el: '#app',
-      data: {
-        message: 'Hello Vue!'
-      }
-    })
-  </script>
-
-  <!--<script type="text/javascript" src="main.js" type="module"></script>-->
   <script src="main-wp.js" type="text/javascript"></script>
-
-
 </html>
