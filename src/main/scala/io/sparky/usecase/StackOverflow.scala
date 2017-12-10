@@ -192,111 +192,175 @@ case class JobSatisfactionByHoursPerWeek(
   jobSatisfactionTotal: BigInt
 )
 
+case class JobSatisfactionByIDE(
+  ide: String,
+  jobSatisfactionMean: Double,
+  jobSatisfactionStdDev: Double,
+  jobSatisfactionTotal: BigInt
+)
+
+case class JobSatisfactionByGender(
+  gender: String,
+  jobSatisfactionMean: Double,
+  jobSatisfactionStdDev: Double,
+  jobSatisfactionTotal: BigInt
+)
+
 object StackOverflow {
+  implicit val jobSatisfactionByIDEEncoder = deriveEncoder[JobSatisfactionByIDE]
   implicit val jobSatisfactionByHoursPerWeekEncoder = deriveEncoder[JobSatisfactionByHoursPerWeek]
+  implicit val jobSatisfactionByGenderEncoder = deriveEncoder[JobSatisfactionByGender]
+
+  val logFile = "/home/damxam/Workspaces/Datasets/survey_results_public.csv"
 
   def main(args: Array[String]): Unit = {
-
-    val logFile = "/home/damxam/Workspaces/Datasets/survey_results_public.csv"
-
     val spark = SparkSession
       .builder
       .master("local")
       .appName("Stack Overflow")
       .getOrCreate()
 
-    // With .as[] we get a dataset
-    {
-      import spark.implicits._
-
-      // Must have case class at top level, else will get a type tag not found which fails implicit case class Encoder derivation!
-      val logDataSet: Dataset[Row] = spark.read
-        .schema(implicitly[Encoder[StackOverflow]].schema)
-        .format("csv")
-        .option("header", "true")
-        .option("inferSchema", "true")
-        .option("mode", "DROPMALFORMED")
-        .load(logFile)
-        .withColumn("IDE", split($"IDE", ";"))
-        .cache()
-
-      val filteredDataSet: Dataset[StackOverflowSubset] = logDataSet
-        .select("CareerSatisfaction", "DeveloperType", "Gender", "HoursPerWeek", "JobSatisfaction", "JobSecurity", "IDE", "WantWorkLanguage")
-        .as[StackOverflowSubset]
-        .cache()
-
-      val careerSatisfactionByIde: DataFrame = logDataSet
-          .select(explode($"IDE").as("IDE"), $"CareerSatisfaction", $"JobSatisfaction")
-          .withColumn("IDE", trim($"IDE"))
-          .groupBy($"IDE")
-          .agg(mean($"CareerSatisfaction"), mean($"JobSatisfaction"), count($"IDE"))
-          .filter("count(IDE) > 20")
-          .sort($"avg(JobSatisfaction)")
-
-      val careerSatisfactionByHoursPerWeek: DataFrame = logDataSet
-        .filter(not(isnull(round($"HoursPerWeek"))))
-        .filter(not($"JobSatisfaction".isin("NA")))
-        .select($"HoursPerWeek", $"JobSatisfaction")
-        .groupBy($"HoursPerWeek")
-        .agg(
-          mean("JobSatisfaction"),
-          stddev("JobSatisfaction"),
-          count("JobSatisfaction")
-        )
-        .filter("count(JobSatisfaction) >= 10")
-        .sort($"avg(JobSatisfaction)")
-        .cache()
-
-
-      val totalCount = logDataSet.count()
-      val jobSatisfactionCount = countValid(logDataSet, $"JobSatisfaction", Some("NA"))
-      val hoursPerWeekCount = countValid(logDataSet, $"HoursPerWeek", Some("NA"))
-
-      val uniques: immutable.Seq[(String, String)] = List(
-        ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
-        ("DeveloperType", filteredDataSet.map(_.DeveloperType).distinct().take(30).toList.toString),
-        ("Gender", filteredDataSet.map(_.Gender).distinct().take(30).toList.toString),
-        ("HoursPerWeek", filteredDataSet.map(_.HoursPerWeek).distinct().take(30).toList.toString),
-        ("JobSatisfaction", filteredDataSet.map(_.JobSatisfaction).distinct().take(30).toList.toString),
-        ("JobSecurity", filteredDataSet.map(_.JobSecurity).distinct().take(30).toList.toString),
-        ("IDE", filteredDataSet.map(_.IDE).distinct().take(30).toList.toString),
-        ("WantWorkLanguage", filteredDataSet.map(_.WantWorkLanguage).distinct().take(30).toList.toString)
-      )
-
-      val careerSatisfactionByIdeResult = careerSatisfactionByIde.take(50).map(_.mkString(" ")).toList
-
-      val careerSatisfactionByHoursWorkedResult = careerSatisfactionByHoursPerWeek.take(50).map(_.mkString(" ")).toList
-
-      val counts = List(
-        s"Total #                 : $totalCount",
-        s"HoursPerWeek #          : $hoursPerWeekCount",
-        s"JobSatisfactionCount #  : $jobSatisfactionCount"
-      )
-
-      write(
-        "./out/results.txt",
-        (
-          counts ++
-          careerSatisfactionByHoursWorkedResult ++
-          careerSatisfactionByIdeResult ++
-          uniques.map(v => s"${v._1}: ${v._2}")
-        ).mkString("\n")
-      )
-
-      val csbwJson = careerSatisfactionByHoursPerWeek
-        .select(
-          $"HoursPerWeek".as("hoursPerWeek"),
-          $"avg(JobSatisfaction)".as("jobSatisfactionMean"),
-          $"stddev_samp(JobSatisfaction)".as("jobSatisfactionStdDev"),
-          $"count(JobSatisfaction)".as("jobSatisfactionTotal")
-        )
-        .as[JobSatisfactionByHoursPerWeek]
-        .collect().toList.asJson
-
-      write("./out/careerSatisfactionByHoursPerWeek.json", csbwJson.spaces2)
-    }
+    run(spark)
 
     spark.stop()
+  }
+
+  def run(implicit spark: SparkSession) = {
+    val logDataSet = base(logFile)
+    general(logDataSet)
+    jobSatisfaction(logDataSet)
+  }
+
+  def base(path: String)(implicit spark: SparkSession): DataFrame = {
+    import spark.implicits._
+
+    spark.read
+      .schema(implicitly[Encoder[StackOverflow]].schema)
+      .format("csv")
+      .option("header", "true")
+      .option("inferSchema", "true")
+      .option("mode", "DROPMALFORMED")
+      .load(path)
+      .withColumn("IDE", split($"IDE", ";"))
+      .cache()
+  }
+
+  def general(logDataSet: DataFrame)(implicit spark: SparkSession): Unit = {
+    import spark.implicits._
+
+    val filteredDataSet: Dataset[StackOverflowSubset] = logDataSet
+      .select("CareerSatisfaction", "DeveloperType", "Gender", "HoursPerWeek", "JobSatisfaction", "JobSecurity", "IDE", "WantWorkLanguage")
+      .as[StackOverflowSubset]
+      .cache()
+
+    val totalCount = logDataSet.count()
+    val jobSatisfactionCount = countValid(logDataSet, $"JobSatisfaction", Some("NA"))
+    val hoursPerWeekCount = countValid(logDataSet, $"HoursPerWeek", Some("NA"))
+
+    val uniques: immutable.Seq[(String, String)] = List(
+      ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
+      ("DeveloperType", filteredDataSet.map(_.DeveloperType).distinct().take(30).toList.toString),
+      ("Gender", filteredDataSet.map(_.Gender).distinct().take(30).toList.toString),
+      ("HoursPerWeek", filteredDataSet.map(_.HoursPerWeek).distinct().take(30).toList.toString),
+      ("JobSatisfaction", filteredDataSet.map(_.JobSatisfaction).distinct().take(30).toList.toString),
+      ("JobSecurity", filteredDataSet.map(_.JobSecurity).distinct().take(30).toList.toString),
+      ("IDE", filteredDataSet.map(_.IDE).distinct().take(30).toList.toString),
+      ("WantWorkLanguage", filteredDataSet.map(_.WantWorkLanguage).distinct().take(30).toList.toString)
+    )
+
+    val counts = List(
+      s"Total #                 : $totalCount",
+      s"HoursPerWeek #          : $hoursPerWeekCount",
+      s"JobSatisfactionCount #  : $jobSatisfactionCount"
+    )
+
+    write(
+      "./out/results.txt",
+      (counts ++ uniques.map(v => s"${v._1}: ${v._2}")).mkString("\n")
+    )
+  }
+
+  def jobSatisfaction(logDataSet: DataFrame)(implicit spark: SparkSession): Unit = {
+    import spark.implicits._
+
+    val hasJobSatisfaction = logDataSet.filter(not($"JobSatisfaction".isin("NA"))).cache()
+
+    // By IDE
+    val jobSatisfactionByIde: DataFrame = hasJobSatisfaction
+      .select(explode($"IDE").as("IDE"), $"JobSatisfaction")
+      .withColumn("IDE", trim($"IDE"))
+      .groupBy($"IDE")
+      .agg(
+        mean($"JobSatisfaction"),
+        stddev($"JobSatisfaction"),
+        count($"JobSatisfaction")
+      )
+      .filter("count(IDE) > 20")
+      .sort($"avg(JobSatisfaction)")
+      .cache()
+
+    val byIDEJson = jobSatisfactionByIde
+      .select(
+        $"IDE".as("ide"),
+        $"avg(JobSatisfaction)".as("jobSatisfactionMean"),
+        $"stddev_samp(JobSatisfaction)".as("jobSatisfactionStdDev"),
+        $"count(JobSatisfaction)".as("jobSatisfactionTotal")
+      )
+      .as[JobSatisfactionByIDE]
+      .collect().toList.asJson
+
+    // By Hours Per Week
+    val jobSatisfactionByHoursPerWeek: DataFrame = hasJobSatisfaction
+      .filter(not(isnull(round($"HoursPerWeek"))))
+      .select($"HoursPerWeek", $"JobSatisfaction")
+      .groupBy($"HoursPerWeek")
+      .agg(
+        mean("JobSatisfaction"),
+        stddev("JobSatisfaction"),
+        count("JobSatisfaction")
+      )
+      .filter("count(JobSatisfaction) >= 10")
+      .sort($"avg(JobSatisfaction)")
+      .cache()
+
+    val byHoursJson = jobSatisfactionByHoursPerWeek
+      .select(
+        $"HoursPerWeek".as("hoursPerWeek"),
+        $"avg(JobSatisfaction)".as("jobSatisfactionMean"),
+        $"stddev_samp(JobSatisfaction)".as("jobSatisfactionStdDev"),
+        $"count(JobSatisfaction)".as("jobSatisfactionTotal")
+      )
+      .as[JobSatisfactionByHoursPerWeek]
+      .collect().toList.asJson
+
+    // By Gender
+    val jobSatisfactionByGender: DataFrame = hasJobSatisfaction
+      .filter($"Gender".isin("Male", "Female"))
+      .groupBy($"Gender")
+      .agg(
+        mean("JobSatisfaction"),
+        stddev("JobSatisfaction"),
+        count("JobSatisfaction")
+      )
+      .filter("count(JobSatisfaction) >= 10")
+      .sort($"avg(JobSatisfaction)")
+      .cache()
+
+    val byGenderJson = jobSatisfactionByGender
+      .select(
+        $"Gender".as("gender"),
+        $"avg(JobSatisfaction)".as("jobSatisfactionMean"),
+        $"stddev_samp(JobSatisfaction)".as("jobSatisfactionStdDev"),
+        $"count(JobSatisfaction)".as("jobSatisfactionTotal")
+      )
+      .as[JobSatisfactionByGender]
+      .collect().toList.asJson
+
+
+    // Write
+    write("./out/jobSatisfactionByHoursPerWeek.json", byHoursJson.spaces2)
+    write("./out/jobSatisfactionByIdeResult.json", byIDEJson.spaces2)
+    write("./out/jobSatisfactionByGender.json", byGenderJson.spaces2)
   }
 
   def countValid(ds: Dataset[Row], column: Column, exclude: Option[String]): Long = {
