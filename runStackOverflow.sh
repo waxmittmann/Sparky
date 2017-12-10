@@ -1,1 +1,1 @@
-sbt "run-main io.sparky.StackOverflow"
+sbt "run-main io.sparky.usecase.StackOverflow"

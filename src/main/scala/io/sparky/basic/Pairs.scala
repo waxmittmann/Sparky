@@ -1,4 +1,4 @@
-package io.sparky
+package io.sparky.basic
 
 //import org.apache.spark.sql.{Dataset, SparkSession}
 import org.apache.spark.rdd.RDD

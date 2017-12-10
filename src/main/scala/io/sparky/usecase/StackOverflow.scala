@@ -1,20 +1,4 @@
-package io.sparky
-
-import java.io.PrintWriter
-import java.nio.charset.{Charset, StandardCharsets}
-import java.nio.file.{FileSystem, FileSystems, Files}
-
-import io.circe.{Encoder => CirceEncoder, _}
-import io.circe.syntax._
-import io.circe.generic.JsonCodec
-import io.circe.generic.semiauto._
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
-
-import scala.collection.immutable
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
-import org.apache.spark.sql.functions._
+package io.sparky.usecase
 
 // Must be at top level, else will get a type tag not found which fails implicit case class Encoder derivation!
 case class StackOverflow(
@@ -173,25 +157,6 @@ case class StackOverflow(
   Salary: String,
   ExpectedSalary: String
 )
-
-case class StackOverflowSubset(
-  CareerSatisfaction: Int,
-  DeveloperType: Option[String],
-  Gender: Option[String],
-  HoursPerWeek: String,
-  JobSatisfaction: Int,
-  JobSecurity: Option[String],
-  IDE: Option[String],
-  WantWorkLanguage: Option[String]
-)
-
-case class JobSatisfactionByHoursPerWeek(
-  hoursPerWeek: String,
-  jobSatisfactionMean: Double,
-  jobSatisfactionStdDev: Double,
-  jobSatisfactionTotal: BigInt
-)
-
 
 object StackOverflow {
   implicit val jobSatisfactionByHoursPerWeekEncoder = deriveEncoder[JobSatisfactionByHoursPerWeek]

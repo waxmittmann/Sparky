@@ -1,10 +1,7 @@
-package io.sparky
-
-import org.apache.spark.sql._
+package io.sparky.usecase
 
 // Must be at top level, else will get a type tag not found which fails implicit case class Encoder derivation!
 case class BeardLengths(id: Int, name: Option[String], age: Option[Int], beardLengthCm: Option[Int])
-case class BeardLengthsProper(id: Int, name: String, age: Int, beardLengthCm: Int)
 
 object BeardLengths {
   def main(args: Array[String]): Unit = {

@@ -1,4 +1,4 @@
-package io.sparky
+package io.sparky.crud
 
 object Test {
 

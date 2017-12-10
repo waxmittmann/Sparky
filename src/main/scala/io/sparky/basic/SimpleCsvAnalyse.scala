@@ -1,11 +1,4 @@
-package io.sparky
-
-import java.io.File
-
-import cats.implicits._
-import com.github.tototoshi.csv._
-
-
+package io.sparky.basic
 
 object SimpleCsvAnalyse {
 
