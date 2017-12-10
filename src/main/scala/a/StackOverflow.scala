@@ -9,12 +9,9 @@ import org.apache.spark.sql.functions._
 import scala.collection.immutable
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
+import org.apache.spark.sql.functions._
 
 // Must be at top level, else will get a type tag not found which fails implicit case class Encoder derivation!
-//case class StackOverflow(id: Int, name: Option[String], age: Option[Int], beardLengthCm: Option[Int])
-//case class BeardLengthsProper(id: Int, name: String, age: Int, beardLengthCm: Int)
-
-
 case class StackOverflow(
   Respondent: String,
   Professional: String,
@@ -177,7 +174,6 @@ case class StackOverflowSubset(
   DeveloperType: Option[String],
   Gender: Option[String],
   HoursPerWeek: String,
-//  JobSatisfaction: Option[Int],
   JobSatisfaction: Int,
   JobSecurity: Option[String],
   IDE: Option[String],
@@ -208,8 +204,7 @@ object StackOverflow {
         .option("inferSchema", "true")
         .option("mode", "DROPMALFORMED")
         .load(logFile)
-        .withColumn("IDE", split($"IDE", ";")) //.show(false)
-//        .withColumn("IDE", expr()$"IDE")
+        .withColumn("IDE", split($"IDE", ";"))g
         .cache()
 
       val filteredDataSet: Dataset[StackOverflowSubset] = logDataSet
@@ -221,19 +216,9 @@ object StackOverflow {
           .select(explode($"IDE").as("IDE"), $"CareerSatisfaction", $"JobSatisfaction")
           .withColumn("IDE", trim($"IDE"))
           .groupBy($"IDE")
-//          .mean("CareerSatisfaction", "JobSatisfaction")
           .agg(mean($"CareerSatisfaction"), mean($"JobSatisfaction"), count($"IDE"))
           .filter("count(IDE) > 20")
           .sort($"avg(JobSatisfaction)")
-
-//      val careerSatisfactionByHoursPerWeek: DataFrame = logDataSet
-//        .filter(not(isnull(round($"HoursPerWeek"))))
-//        .filter(not($"CareerSatisfaction".isin("NA")))
-//        .filter(not($"JobSatisfaction".isin("NA")))
-//        .select($"HoursPerWeek", $"CareerSatisfaction", $"JobSatisfaction")
-//        .groupBy($"HoursPerWeek")
-//        .mean("CareerSatisfaction", "JobSatisfaction")
-//        .sort($"avg(JobSatisfaction)")
 
       val careerSatisfactionByHoursPerWeek: DataFrame = logDataSet
         .filter(not(isnull(round($"HoursPerWeek"))))
@@ -246,7 +231,6 @@ object StackOverflow {
           count("JobSatisfaction")
         )
         .filter("count(JobSatisfaction) >= 10")
-        //.mean("JobSatisfaction")
         .sort($"avg(JobSatisfaction)")
 
       val jobSatisfactionCount = logDataSet
@@ -260,8 +244,6 @@ object StackOverflow {
         .count()
 
       val totalCount = logDataSet.count()
-
-      import org.apache.spark.sql.functions._
 
       val uniques: immutable.Seq[(String, String)] = List(
         ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
@@ -291,47 +273,7 @@ object StackOverflow {
       )
 
 
-      //      val uniques: immutable.Seq[(String, String)] = List(
-//        ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
-//        ("AssessJobExp", filteredDataSet.map(_.AssessJobExp).distinct().take(30).toList.toString),
-//        ("BuildingThings", filteredDataSet.map(_.BuildingThings).distinct().take(30).toList.toString),
-//        ("ChallengeMyself", filteredDataSet.map(_.ChallengeMyself).distinct().take(30).toList.toString),
-//        ("ChangeWorld", filteredDataSet.map(_.ChangeWorld).distinct().take(30).toList.toString),
-//        ("CompanySize", filteredDataSet.map(_.CompanySize).distinct().take(30).toList.toString),
-//        ("CompanyType", filteredDataSet.map(_.CompanyType).distinct().take(30).toList.toString),
-//        ("CompetePeers", filteredDataSet.map(_.CompetePeers).distinct().take(30).toList.toString),
-//        ("DeveloperType", filteredDataSet.map(_.DeveloperType).distinct().take(30).toList.toString),
-//        ("DiversityImportant", filteredDataSet.map(_.DiversityImportant).distinct().take(30).toList.toString),
-//        ("EducationImportant", filteredDataSet.map(_.EducationImportant).distinct().take(30).toList.toString),
-//        ("EducationTypes", filteredDataSet.map(_.EducationTypes).distinct().take(30).toList.toString),
-//        ("EmploymentStatus", filteredDataSet.map(_.EmploymentStatus).distinct().take(30).toList.toString),
-//        ("EnjoyDebugging", filteredDataSet.map(_.EnjoyDebugging).distinct().take(30).toList.toString),
-//        ("Gender", filteredDataSet.map(_.Gender).distinct().take(30).toList.toString),
-//        ("HaveWorkedDatabase", filteredDataSet.map(_.HaveWorkedDatabase).distinct().take(30).toList.toString),
-//        ("HaveWorkedLanguage", filteredDataSet.map(_.HaveWorkedLanguage).distinct().take(30).toList.toString),
-//        ("HaveWorkedPlatform", filteredDataSet.map(_.HaveWorkedPlatform).distinct().take(30).toList.toString),
-//        ("HaveWorkedFramework", filteredDataSet.map(_.HaveWorkedFramework).distinct().take(30).toList.toString),
-//        ("HoursPerWeek", filteredDataSet.map(_.HoursPerWeek).distinct().take(30).toList.toString),
-//        ("JobSatisfaction", filteredDataSet.map(_.JobSatisfaction).distinct().take(30).toList.toString),
-//        ("JobSecurity", filteredDataSet.map(_.JobSecurity).distinct().take(30).toList.toString),
-//        ("IDE", filteredDataSet.map(_.IDE).distinct().take(30).toList.toString),
-//        ("WantWorkLanguage", filteredDataSet.map(_.WantWorkLanguage).distinct().take(30).toList.toString)
-//      )
-
-
-      println("\n\n\nAnswers:")
-      println(careerSatisfactionByIde.take(50).map(_.mkString(" ")).mkString("\n"))
-
-      println("\n\n\nUniques:")
-      println(uniques.map((v: (String, String)) => s"${v._1}: ${v._2}").mkString("\n"))
-//
-//      val largest: List[StackOverflow] = filteredDataSet.take(10).toList
-//
-//      // Print filtered-out rows
-//      println(logDataSet.count() + ", " + filteredDataSet.count())
-//
-//      // Print result
-//      println(largest.mkString("\n"))
+      println("Done (check results.txt)")
     }
 
     spark.stop()
