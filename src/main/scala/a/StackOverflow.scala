@@ -211,9 +211,6 @@ object StackOverflow {
         //ta.withColumn("D", split($"A", "\\.")(0)).show(false)
 //        .withColumn("IDE", split($"IDE", ";")(0)) //.show(false)
         .withColumn("IDE", split($"IDE", ";")) //.show(false)
-        .filter(not(isnull(round($"HoursPerWeek"))))
-        .filter(not($"CareerSatisfaction".isin("NA")))
-        .filter(not($"JobSatisfaction".isin("NA")))
         .cache()
 //        .filter($"CareerSatisfaction".
 //        .withColumn("HoursPerWeek", map($"HoursPerWeek"))
@@ -225,20 +222,33 @@ object StackOverflow {
         .as[StackOverflowSubset]
         .cache()
 
-      val answers: DataFrame = logDataSet
-          .select(explode($"IDE").as("IDE"), $"CareerSatisfaction")
-          //.select(grouping($"IDE"))
-          //.select(grouping($"IDE"), mean($"CareerSatisfaction"))
-          //.groupBy("IDE")
+      val careerSatisfactionByIde: DataFrame = logDataSet
+          .select(explode($"IDE").as("IDE"), $"CareerSatisfaction", $"JobSatisfaction")
           .groupBy($"IDE")
-          .mean("CareerSatisfaction")
-          //.select($"IDE, COUNT(CareerSatisfaction")
-          //.select(mean($"CareerSatisfaction"))
-          //.select("IDE", "CareerSatisfaction")
-//        .withColumn("SatisfactionByIDE", expr(""))
-//        .selectExpr("SELECT CareerSatisfaction, ")
+          .mean("CareerSatisfaction", "JobSatisfaction")
 
-//      val filteredDataSet = logDataSet.cache()
+//      val careerSatisfactionByHoursPerWeek: DataFrame = logDataSet
+//        .filter(not(isnull(round($"HoursPerWeek"))))
+//        .filter(not($"CareerSatisfaction".isin("NA")))
+//        .filter(not($"JobSatisfaction".isin("NA")))
+//        .select($"HoursPerWeek", $"CareerSatisfaction", $"JobSatisfaction")
+//        .groupBy($"HoursPerWeek")
+//        .mean("CareerSatisfaction", "JobSatisfaction")
+//        .sort($"avg(JobSatisfaction)")
+
+      val careerSatisfactionByHoursPerWeek: DataFrame = logDataSet
+        .filter(not(isnull(round($"HoursPerWeek"))))
+        .filter(not($"JobSatisfaction".isin("NA")))
+        .select($"HoursPerWeek", $"JobSatisfaction")
+        .groupBy($"HoursPerWeek")
+        .agg(
+          mean("JobSatisfaction"),
+          stddev("JobSatisfaction"),
+          count("JobSatisfaction")
+        )
+        .filter("count(JobSatisfaction) >= 10")
+        //.mean("JobSatisfaction")
+        .sort($"avg(JobSatisfaction)")
 
       import org.apache.spark.sql.functions._
 
@@ -254,8 +264,14 @@ object StackOverflow {
       )
 
 
-      val answersStr = answers.take(50).map(_.mkString(" ")).toList
-      Files.write(FileSystems.getDefault.getPath("./results.txt"), (answersStr ++ uniques.map(v => s"${v._1}: ${v._2}")).asJava, Charset.defaultCharset())
+      val careerSatisfactionByIdeResult = careerSatisfactionByIde.take(50).map(_.mkString(" ")).toList
+
+      val careerSatisfactionByHoursWorkedResult = careerSatisfactionByHoursPerWeek.take(50).map(_.mkString(" ")).toList
+
+      Files.write(FileSystems.getDefault.getPath("./results.txt"),
+        (careerSatisfactionByHoursWorkedResult ++ careerSatisfactionByIdeResult ++ uniques.map(v => s"${v._1}: ${v._2}")).asJava,
+        Charset.defaultCharset()
+      )
 
 
       //      val uniques: immutable.Seq[(String, String)] = List(
@@ -287,7 +303,7 @@ object StackOverflow {
 
 
       println("\n\n\nAnswers:")
-      println(answers.take(50).map(_.mkString(" ")).mkString("\n"))
+      println(careerSatisfactionByIde.take(50).map(_.mkString(" ")).mkString("\n"))
 
       println("\n\n\nUniques:")
       println(uniques.map((v: (String, String)) => s"${v._1}: ${v._2}").mkString("\n"))
