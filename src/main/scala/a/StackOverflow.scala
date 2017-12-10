@@ -283,9 +283,14 @@ object StackOverflow {
         s"JobSatisfactionCount #  : $jobSatisfactionCount"
       )
 
-      Files.write(FileSystems.getDefault.getPath("./results.txt"),
-        (counts ++ careerSatisfactionByHoursWorkedResult ++ careerSatisfactionByIdeResult ++ uniques.map(v => s"${v._1}: ${v._2}")).asJava,
-        Charset.defaultCharset()
+      write(
+        "./out/results.txt",
+        (
+          counts ++
+          careerSatisfactionByHoursWorkedResult ++
+          careerSatisfactionByIdeResult ++
+          uniques.map(v => s"${v._1}: ${v._2}")
+        ).mkString("\n")
       )
 
       val csbwJson = careerSatisfactionByHoursPerWeek
@@ -298,21 +303,16 @@ object StackOverflow {
         .as[JobSatisfactionByHoursPerWeek]
         .collect().toList.asJson
 
-      implicitly[CirceEncoder[BigInt]]
-
-      Files.write(
-        FileSystems.getDefault.getPath("./careerSatisfactionByHoursPerWeek.json"),
-        csbwJson.spaces2.getBytes(StandardCharsets.UTF_8)
-      )
-
-//      new PrintWriter("./careerSatisfactionByHoursPerWeek.json") { write(csbwJson.spaces2); close() }
-
-//      careerSatisfactionByHoursPerWeek.write.json("./satisfactionByHoursPerWeek.json")
-//      careerSatisfactionByHoursPerWeek.write.json("./satisfactionByHoursPerWeek.json")
-//      careerSatisfactionByHoursPerWeek.write.format("org.apache.spark.sql.json").mode(SaveMode.Append).save("./satisfactionByHoursPerWeek.json")
-//      careerSatisfactionByHoursPerWeek.write.format("org.apache.spark.sql.json").mode(SaveMode.Append).bucketBy(1, "HoursPerWeek").save("./satisfactionByHoursPerWeek")
+      write("./out/careerSatisfactionByHoursPerWeek.json", csbwJson.spaces2)
     }
 
     spark.stop()
+  }
+
+  def write(dest: String, output: String): Unit = {
+    Files.write(
+      FileSystems.getDefault.getPath(dest),
+      output.getBytes(StandardCharsets.UTF_8)
+    )
   }
 }
