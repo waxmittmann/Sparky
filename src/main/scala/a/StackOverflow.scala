@@ -1,6 +1,7 @@
 package a
 
 import org.apache.spark.sql._
+import org.apache.spark.sql.functions._
 
 import scala.collection.immutable
 
@@ -170,7 +171,7 @@ case class StackOverflowSubset(
   CareerSatisfaction: Option[String],
   DeveloperType: Option[String],
   Gender: Option[String],
-  HoursPerWeek: Option[String],
+  HoursPerWeek: String,
   JobSatisfaction: Option[String],
   JobSecurity: Option[String],
   IDE: Option[String],
@@ -194,18 +195,42 @@ object StackOverflow {
       import spark.implicits._
 
       // Must have case class at top level, else will get a type tag not found which fails implicit case class Encoder derivation!
-      val logDataSet: Dataset[StackOverflowSubset] = spark.read
+      val logDataSet: Dataset[Row] = spark.read
         .schema(implicitly[Encoder[StackOverflow]].schema)
         .format("csv")
         .option("header", "true")
         .option("inferSchema", "true")
         .option("mode", "DROPMALFORMED")
         .load(logFile)
+        //ta.withColumn("D", split($"A", "\\.")(0)).show(false)
+//        .withColumn("IDE", split($"IDE", ";")(0)) //.show(false)
+        .withColumn("IDE", split($"IDE", ";")) //.show(false)
+        .filter(not(isnull(round($"HoursPerWeek"))))
+        .filter(not($"CareerSatisfaction".isin("NA")))
+        .filter(not($"JobSatisfaction".isin("NA")))
+        .cache()
+//        .filter($"CareerSatisfaction".
+//        .withColumn("HoursPerWeek", map($"HoursPerWeek"))
+//        .withColumn("HoursPerWeek", format_number($"HoursPerWeek", 0))
+
+
+      val filteredDataSet: Dataset[StackOverflowSubset] = logDataSet
         .select("CareerSatisfaction", "DeveloperType", "Gender", "HoursPerWeek", "JobSatisfaction", "JobSecurity", "IDE", "WantWorkLanguage")
         .as[StackOverflowSubset]
         .cache()
 
-      val filteredDataSet = logDataSet.cache()
+      val answers = logDataSet
+          .select(explode($"IDE").as("IDE"), $"CareerSatisfaction")
+          //.select(grouping($"IDE"))
+          //.select(grouping($"IDE"), mean($"CareerSatisfaction"))
+          //.groupBy("IDE")
+          .select("IDE, COUNT(CareerSatisfaction")
+          //.select(mean($"CareerSatisfaction"))
+          //.select("IDE", "CareerSatisfaction")
+//        .withColumn("SatisfactionByIDE", expr(""))
+//        .selectExpr("SELECT CareerSatisfaction, ")
+
+//      val filteredDataSet = logDataSet.cache()
 
       import org.apache.spark.sql.functions._
 
@@ -247,6 +272,11 @@ object StackOverflow {
 //        ("WantWorkLanguage", filteredDataSet.map(_.WantWorkLanguage).distinct().take(30).toList.toString)
 //      )
 
+
+      println("\n\n\nAnswers:")
+      println(answers.take(50).map(_.mkString(" ")).mkString("\n"))
+
+      println("\n\n\nUniques:")
       println(uniques.map((v: (String, String)) => s"${v._1}: ${v._2}").mkString("\n"))
 //
 //      val largest: List[StackOverflow] = filteredDataSet.take(10).toList
