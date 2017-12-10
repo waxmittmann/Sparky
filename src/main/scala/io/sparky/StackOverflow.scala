@@ -1,4 +1,4 @@
-package a
+package io.sparky
 
 import java.io.PrintWriter
 import java.nio.charset.{Charset, StandardCharsets}
@@ -185,7 +185,6 @@ case class StackOverflowSubset(
   WantWorkLanguage: Option[String]
 )
 
-//@JsonCodec
 case class JobSatisfactionByHoursPerWeek(
   hoursPerWeek: String,
   jobSatisfactionMean: Double,
@@ -249,17 +248,10 @@ object StackOverflow {
         .sort($"avg(JobSatisfaction)")
         .cache()
 
-      val jobSatisfactionCount = logDataSet
-        .filter(not(isnull($"JobSatisfaction")))
-        .filter(not($"JobSatisfaction".isin("NA")))
-        .count()
-
-      val hoursPerWeekCount = logDataSet
-        .filter(not(isnull($"HoursPerWeek")))
-        .filter(not($"HoursPerWeek".isin("NA")))
-        .count()
 
       val totalCount = logDataSet.count()
+      val jobSatisfactionCount = countValid(logDataSet, $"JobSatisfaction", Some("NA"))
+      val hoursPerWeekCount = countValid(logDataSet, $"HoursPerWeek", Some("NA"))
 
       val uniques: immutable.Seq[(String, String)] = List(
         ("CareerSatisfaction", filteredDataSet.map(_.CareerSatisfaction).distinct().take(30).toList.toString),
@@ -271,7 +263,6 @@ object StackOverflow {
         ("IDE", filteredDataSet.map(_.IDE).distinct().take(30).toList.toString),
         ("WantWorkLanguage", filteredDataSet.map(_.WantWorkLanguage).distinct().take(30).toList.toString)
       )
-
 
       val careerSatisfactionByIdeResult = careerSatisfactionByIde.take(50).map(_.mkString(" ")).toList
 
@@ -307,6 +298,16 @@ object StackOverflow {
     }
 
     spark.stop()
+  }
+
+  def countValid(ds: Dataset[Row], column: Column, exclude: Option[String]): Long = {
+    val withoutNulls = ds
+      .filter(not(isnull(column)))
+
+    val withoutExclude = exclude
+      .map(excludeStr => withoutNulls.filter(not(column.isin(excludeStr)))).getOrElse(withoutNulls)
+
+    withoutExclude.count()
   }
 
   def write(dest: String, output: String): Unit = {

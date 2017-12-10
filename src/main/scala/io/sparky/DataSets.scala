@@ -1,4 +1,4 @@
-package a
+package io.sparky
 
 import org.apache.spark.sql._
 

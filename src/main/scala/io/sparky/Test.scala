@@ -1,4 +1,4 @@
-package a
+package io.sparky
 
 object Test {
 

@@ -1,6 +1,5 @@
-package a
+package io.sparky
 
-import org.apache.spark._
 import org.apache.spark.sql._
 
 object MorePairs extends App {

@@ -1,13 +1,9 @@
-package a
+package io.sparky
 
 import java.io.File
 
-import com.github.tototoshi.csv._
-
-import scala.collection.immutable
-
-import cats.Semigroup
 import cats.implicits._
+import com.github.tototoshi.csv._
 
 
 

@@ -1,7 +1,6 @@
-package a
+package io.sparky
 
 import org.apache.spark.sql._
-import org.apache.spark._
 
 object Numeric {
 

@@ -1,7 +1,6 @@
-package a
+package io.sparky
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.hive.HiveContext
 
 object SparkSql {
 
