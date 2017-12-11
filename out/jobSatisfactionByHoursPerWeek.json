@@ -75,7 +75,7 @@
     "hoursPerWeek" : 2e1,
     "jobSatisfactionMean" : 5.4,
     "jobSatisfactionStdDev" : 3.1187041843486347,
-    "jobSatisfactionTotal" : 2e1
+    "jobSatisfactionTotal" : 20
   },
   {
     "hoursPerWeek" : 4e1,

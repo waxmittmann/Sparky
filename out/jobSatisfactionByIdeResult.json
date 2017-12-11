@@ -21,7 +21,7 @@
     "ide" : "Atom",
     "jobSatisfactionMean" : 5.89375,
     "jobSatisfactionStdDev" : 2.3407703806317195,
-    "jobSatisfactionTotal" : 16e1
+    "jobSatisfactionTotal" : 160
   },
   {
     "ide" : "RStudio",
@@ -63,7 +63,7 @@
     "ide" : "Visual Studio",
     "jobSatisfactionMean" : 6.096774193548387,
     "jobSatisfactionStdDev" : 2.4116067601652875,
-    "jobSatisfactionTotal" : 31e1
+    "jobSatisfactionTotal" : 310
   },
   {
     "ide" : "Xcode",

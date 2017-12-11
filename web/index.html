@@ -22,10 +22,24 @@
     <style>
       .col {
         padding: 20px;
-        margin: 10px;
         border-radius: 20px;
+      }
+
+      .col-border {
         border: 1px #EEEEFF solid;
       }
+
+      .explanation {
+         background-color: #FFFFBB;
+         text-align: center;
+         padding: 10px;
+      }
+
+
+      .jumbotron {
+         background-color: #EFEFBB;
+      }
+
     </style>
   </head>
   <!--background-color: #EEEEEF;-->
@@ -42,32 +56,107 @@
         </p>
       </div>
 
+      <!--<button type="button" class="btn btn-default" aria-label="Left Align">-->
+        <!--<span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>-->
+      <!--</button>-->
+
       <div class="container-fluid" style="max-width: 1200px">
-        <div class="row">
+
+        <div class="row col-border">
           <div class="col">
-            <h2>Job Satisfaction by IDE</h2>
-            <div class="chart" id="jobSatisfactionByIde"></div>
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col">
+                  <h2>Job Satisfaction by IDE</h2>
+                  <div class="chart" id="jobSatisfactionByIde"></div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col explanation">
+                    Nobody tell the VIM users! So... IDEs win?
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="row">
+        <div class="row col-border">
           <div class="col">
-            <h2>Job Satisfaction by Gender</h2>
-            <div class="chart" id="jobSatisfactionByGender"></div>
+            <div class="container">
+              <div class="row">
+                <div class="col" style="max-width: 400px">
+                  <h2>Job Satisfaction by Gender</h2>
+                  <div class="chart" id="jobSatisfactionByGender"></div>
+                </div>
+                <div class="col explanation" style="max-width: 100px">
+                  <div style="font-size: 40px">...</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="col">
-            <h2>Are you overpaid?</h2>
-            <div class="chart" id="overpaid"></div>
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <h2>Are you overpaid?</h2>
+                  <div class="chart" id="overpaid"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col explanation">
+                  Now who would've expected that ;)
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="row">
+        <div class="row col-border">
           <div class="col">
-            <h2>Job Satisfaction by Hours Per Week</h2>
-            <div class="chart" id="jobSatisfactionByHoursPerWeek"></div>
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <h2>Job Satisfaction by Hours Per Week</h2>
+                  <div class="chart" id="jobSatisfactionByHoursPerWeek"></div>
+                </div>
+                <div class="row">
+                  <div class="col explanation" style="max-width: 250px; text-align: left">
+                    So...
+                    <ul>
+                      <li>0 hours makes you happy.</li>
+                      <li>40 is fine too.</li>
+                      <li>Just do NOT work 12 hours a week.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
+
+        <div class="row col-border">
+          <div class="col">
+            <div class="container">
+              <div class="row">
+                <div class="col explanation" style="text-align: center">
+                  If only could've figured out that gimbal lock...
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <h2>Job Satisfaction by Developer Type</h2>
+                  <div class="chart" id="jobSatisfactionByDeveloperType"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
       </div>
     </div>
   </body>

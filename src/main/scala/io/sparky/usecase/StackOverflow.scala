@@ -190,21 +190,28 @@ case class JobSatisfactionByHoursPerWeek(
   hoursPerWeek: BigInt,
   jobSatisfactionMean: Double,
   jobSatisfactionStdDev: Double,
-  jobSatisfactionTotal: BigInt
+  jobSatisfactionTotal: Long
 )
 
 case class JobSatisfactionByIDE(
   ide: String,
   jobSatisfactionMean: Double,
   jobSatisfactionStdDev: Double,
-  jobSatisfactionTotal: BigInt
+  jobSatisfactionTotal: Long
+)
+
+case class JobSatisfactionByDeveloperType(
+ developerType: String,
+ jobSatisfactionMean: Double,
+ jobSatisfactionStdDev: Double,
+ jobSatisfactionTotal: Long
 )
 
 case class JobSatisfactionByGender(
   gender: String,
   jobSatisfactionMean: Double,
   jobSatisfactionStdDev: Double,
-  jobSatisfactionTotal: BigInt
+  jobSatisfactionTotal: Long
 )
 
 case class Overpaid(
@@ -216,6 +223,7 @@ object StackOverflow {
   implicit val jobSatisfactionByIDEEncoder = deriveEncoder[JobSatisfactionByIDE]
   implicit val jobSatisfactionByHoursPerWeekEncoder = deriveEncoder[JobSatisfactionByHoursPerWeek]
   implicit val jobSatisfactionByGenderEncoder = deriveEncoder[JobSatisfactionByGender]
+  implicit val jobSatisfactionByDeveloperTypeEncoder = deriveEncoder[JobSatisfactionByDeveloperType]
   implicit val overpaidEncoder = deriveEncoder[Overpaid]
 
   val logFile = "/home/damxam/Workspaces/Datasets/survey_results_public.csv"
@@ -234,8 +242,8 @@ object StackOverflow {
 
   def run(implicit spark: SparkSession) = {
     val logDataSet = base(logFile)
-//    general(logDataSet)
-//    jobSatisfaction(logDataSet)
+    general(logDataSet)
+    jobSatisfaction(logDataSet)
     overpaid(logDataSet)
   }
 
@@ -250,6 +258,7 @@ object StackOverflow {
       .option("mode", "DROPMALFORMED")
       .load(path)
       .withColumn("IDE", split($"IDE", ";"))
+      .withColumn("DeveloperType", split($"DeveloperType", ";"))
       .cache()
   }
 
@@ -337,6 +346,31 @@ object StackOverflow {
       .as[JobSatisfactionByIDE]
       .collect().toList.asJson
 
+    // By Developer Type
+    val jobSatisfactionByDeveloperType: DataFrame = hasJobSatisfaction
+      .select(explode($"DeveloperType").as("DeveloperType"), $"JobSatisfaction")
+      .withColumn("DeveloperType", trim($"DeveloperType"))
+      .groupBy($"DeveloperType")
+      .agg(
+        mean($"JobSatisfaction"),
+        stddev($"JobSatisfaction"),
+        count($"JobSatisfaction")
+      )
+      .filter("count(DeveloperType) > 20")
+      .sort($"avg(JobSatisfaction)")
+      .cache()
+
+    val byDeveloperTypeJson = jobSatisfactionByDeveloperType
+      .select(
+        $"DeveloperType".as("developerType"),
+        $"avg(JobSatisfaction)".as("jobSatisfactionMean"),
+        $"stddev_samp(JobSatisfaction)".as("jobSatisfactionStdDev"),
+        $"count(JobSatisfaction)".as("jobSatisfactionTotal")
+      )
+      .as[JobSatisfactionByDeveloperType]
+      .collect().toList.asJson
+
+
     // By Hours Per Week
     val jobSatisfactionByHoursPerWeek: DataFrame = hasJobSatisfaction
       .filter(not(isnull(round($"HoursPerWeek"))))
@@ -388,6 +422,7 @@ object StackOverflow {
     write("./out/jobSatisfactionByHoursPerWeek.json", byHoursJson.spaces2)
     write("./out/jobSatisfactionByIdeResult.json", byIDEJson.spaces2)
     write("./out/jobSatisfactionByGender.json", byGenderJson.spaces2)
+    write("./out/jobSatisfactionByDeveloperTypeJson.json", byDeveloperTypeJson.spaces2)
   }
 
   def countValid(ds: Dataset[Row], column: Column, exclude: Option[String]): Long = {

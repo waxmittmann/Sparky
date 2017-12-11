@@ -75,8 +75,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__out_jobSatisfactionByHoursPerWeek_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__out_jobSatisfactionByHoursPerWeek_json__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__out_jobSatisfactionByGender_json__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__out_jobSatisfactionByGender_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__out_jobSatisfactionByGender_json__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__out_overpaid_json__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__out_overpaid_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__out_overpaid_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__out_jobSatisfactionByDeveloperTypeJson_json__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__out_jobSatisfactionByDeveloperTypeJson_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__out_jobSatisfactionByDeveloperTypeJson_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__out_overpaid_json__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__out_overpaid_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__out_overpaid_json__);
+
 
 
 
@@ -188,10 +191,44 @@ var jobSatisfactionByHours = c3.generate(
     }
 );
 
+
+var jobSatisfactionByDeveloperType = c3.generate(
+    {
+        bindto: '#jobSatisfactionByDeveloperType',
+        data: {
+            x: 'x',
+            columns: [
+                ['x'].concat(Array.from(__WEBPACK_IMPORTED_MODULE_3__out_jobSatisfactionByDeveloperTypeJson_json___default.a, d => d.developerType)),
+                ['DeveloperType'].concat(Array.from(__WEBPACK_IMPORTED_MODULE_3__out_jobSatisfactionByDeveloperTypeJson_json___default.a, d => d.jobSatisfactionMean)),
+            ],
+            groups: [
+                ['developerType']
+            ],
+            type: 'bar'
+        },
+        bar: {
+            width: {
+                // ratio: 0.5 // this makes bar width 50% of length between ticks
+                ratio: 0.85 // this makes bar width 50% of length between ticks
+            }
+            // or
+            //width: 100 // this makes bar width 100px
+        },
+         axis: {
+            x: {
+                type: 'category' // this needed to load string x value
+            },
+            y: {
+                min: 5.5
+            }
+        }
+    }
+);
+
 var overpaid = c3.generate({
     bindto: "#overpaid",
     data: {
-        columns: __WEBPACK_IMPORTED_MODULE_3__out_overpaid_json___default.a.map(x => [x.overpaid, x.count]),
+        columns: __WEBPACK_IMPORTED_MODULE_4__out_overpaid_json___default.a.map(x => [x.overpaid, x.count]),
         type : 'pie',
         onclick: function (d, i) { console.log("onclick", d, i); },
         onmouseover: function (d, i) { console.log("onmouseover", d, i); },
@@ -219,6 +256,12 @@ module.exports = [{"gender":"Female","jobSatisfactionMean":5.602941176470588,"jo
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports) {
+
+module.exports = [{"developerType":"NA","jobSatisfactionMean":5.859813084112149,"jobSatisfactionStdDev":2.6429056357804774,"jobSatisfactionTotal":214},{"developerType":"Machine learning specialist","jobSatisfactionMean":5.888888888888889,"jobSatisfactionStdDev":3.021615251841096,"jobSatisfactionTotal":36},{"developerType":"Quality assurance engineer","jobSatisfactionMean":5.955555555555556,"jobSatisfactionStdDev":2.74653132941067,"jobSatisfactionTotal":45},{"developerType":"Systems administrator","jobSatisfactionMean":6.121212121212121,"jobSatisfactionStdDev":2.3916211190308627,"jobSatisfactionTotal":99},{"developerType":"DevOps specialist","jobSatisfactionMean":6.127906976744186,"jobSatisfactionStdDev":2.738812587827957,"jobSatisfactionTotal":86},{"developerType":"Web developer","jobSatisfactionMean":6.127937336814622,"jobSatisfactionStdDev":2.302446025565716,"jobSatisfactionTotal":766},{"developerType":"Database administrator","jobSatisfactionMean":6.128834355828221,"jobSatisfactionStdDev":2.5071434713579683,"jobSatisfactionTotal":163},{"developerType":"Data scientist","jobSatisfactionMean":6.158536585365853,"jobSatisfactionStdDev":2.8217388570981075,"jobSatisfactionTotal":82},{"developerType":"Developer with a statistics or mathematics background","jobSatisfactionMean":6.2214285714285715,"jobSatisfactionStdDev":2.411208411161404,"jobSatisfactionTotal":140},{"developerType":"Desktop applications developer","jobSatisfactionMean":6.256505576208179,"jobSatisfactionStdDev":2.3589311986904913,"jobSatisfactionTotal":269},{"developerType":"Other","jobSatisfactionMean":6.357142857142857,"jobSatisfactionStdDev":2.626706287601461,"jobSatisfactionTotal":70},{"developerType":"Mobile developer","jobSatisfactionMean":6.3765822784810124,"jobSatisfactionStdDev":2.215520082165496,"jobSatisfactionTotal":316},{"developerType":"Embedded applications/devices developer","jobSatisfactionMean":6.552941176470588,"jobSatisfactionStdDev":2.447087103908981,"jobSatisfactionTotal":85},{"developerType":"Graphic designer","jobSatisfactionMean":6.60377358490566,"jobSatisfactionStdDev":2.4833261088981,"jobSatisfactionTotal":53},{"developerType":"Graphics programming","jobSatisfactionMean":6.931818181818182,"jobSatisfactionStdDev":2.756790578146036,"jobSatisfactionTotal":44}]
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports) {
 
 module.exports = [{"overpaid":"Neither underpaid nor overpaid","count":93},{"overpaid":"Greatly overpaid","count":5},{"overpaid":"Somewhat overpaid","count":21},{"overpaid":"Somewhat underpaid","count":160},{"overpaid":"Greatly underpaid","count":62}]
