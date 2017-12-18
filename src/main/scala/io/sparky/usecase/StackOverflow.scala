@@ -338,93 +338,39 @@ object StackOverflow {
   def developerTypeByGender(logDataSet: DataFrame)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
 
+    def selectByGender(gender: String): String = s"""
+          SELECT DeveloperType, COUNT(DeveloperType) AS Count
+            FROM v
+            WHERE Gender = '$gender'
+            GROUP BY DeveloperType
+      """
+
+    // If other were > 0.05, would need to fix as otherwise we'd have two others
+    def mergeLess5ToOther(femaleResult: List[DeveloperTypeCount]) = {
+      val total = femaleResult.map(_.count).sum
+      val totalLarger5Percent = femaleResult.map(v => (v, v.count.toDouble / total)).filter(_._2 >= 0.05).map(_._1)
+      val totalSmaller5PercentCount = femaleResult.map(v => (v, v.count.toDouble / total)).filter(_._2 < 0.05).map(_._1.count).sum
+      val totalSmaller5Percent = DeveloperTypeCount("Other", totalSmaller5PercentCount)
+      val all = (totalSmaller5Percent :: totalLarger5Percent).asJson
+      all
+    }
+
     // By Developer Type
     val developerTypeByGender: DataFrame = logDataSet
-//      .filter($"Gender".isin("Male", "Female"))
-//      .filter($"Gender".isin("Male"))
       .select(explode($"DeveloperType").as("DeveloperType"), $"Gender")
       .withColumn("DeveloperType", trim($"DeveloperType"))
       .cache()
-//      .filter("count(DeveloperType) > 20")
-//      .groupBy($"Gender")
-//      .agg(count($"DeveloperType"))
-//      .groupBy($"DeveloperType")
-//      .agg(count($"Gender"))
-//      .count()
-
-
-    // Hmm, how could I do this in one go? I think I can see how it'd work with RDDs, so it should? work with sql?
-//    val female = developerTypeByGender
-//      .filter($"Gender".isin("Female"))
-//      .groupBy($"DeveloperType")
-//      .agg(count($"Gender"))
-//      .select($"count(Gender)".alias("count"), $"DeveloperType")
-//      .as[DeveloperTypeCount]
-//      .collect().toList.asJson
-
-
-//    developerTypeByGender.createOrReplaceTempView("v")
-//    val female = spark.sqlContext.sql("""
-//        SELECT DeveloperType, Count, Total, Count / Total AS Percentage FROM (
-//          SELECT DeveloperType, COUNT(DeveloperType) AS Count, (SELECT COUNT(*) FROM v WHERE Gender = 'Female') AS Total FROM v WHERE Gender = 'Female'
-//          GROUP BY DeveloperType
-//        ) WHERE (Count / Total) >= 0.05
-//      """)
-
     developerTypeByGender.createOrReplaceTempView("v")
-    val femaleResult = spark.sqlContext.sql("""
-          SELECT DeveloperType, COUNT(DeveloperType) AS Count
-            FROM v
-            WHERE Gender = 'Female'
-            GROUP BY DeveloperType
-      """)
 
-
-      //        WHERE (Count / Total) >= 0.1
-
-      //    val female = spark.sqlContext.sql("""
-//        SELECT DeveloperType, COUNT(DeveloperType) AS Count, COUNT(*) AS Total,
-//            CAST(Count / Total) Percentage
-//          FROM v
-//          WHERE Gender = 'Female' AND Percentage <= 0.1
-//          GROUP BY DeveloperType
-//      """)
-//      .as[DeveloperTypeCountWithPercentage]
+    val femaleResult = spark.sqlContext.sql(selectByGender("Female"))
       .as[DeveloperTypeCount]
       .collect().toList
+    val female = mergeLess5ToOther(femaleResult)
 
-    // If other were < 0.5, would need to fix
-    val femaleTotal = femaleResult.map(_.count).sum
-    val femaleLargerThan5 = femaleResult.map(v => (v, v.count.toDouble / femaleTotal)).filter(_._2 >= 0.05).map(_._1)
-    val femaleOtherCount = femaleResult.map(v => (v, v.count.toDouble / femaleTotal)).filter(_._2 < 0.05).map(_._1.count).sum
-    val femaleOther = DeveloperTypeCount("Other", femaleOtherCount)
-    val female = (femaleOther :: femaleLargerThan5).asJson
-
-//    val male = developerTypeByGender
-//      .filter($"Gender".isin("Male"))
-//      .groupBy($"DeveloperType")
-//      .agg(count($"Gender"))
-//      .select($"count(Gender)".alias("count"), $"DeveloperType")
-//      .as[DeveloperTypeCount]
-//      .collect().toList.asJson
-
-    developerTypeByGender.createOrReplaceTempView("v")
-    val maleResult = spark.sqlContext.sql("""
-          SELECT DeveloperType, COUNT(DeveloperType) AS Count
-            FROM v
-            WHERE Gender = 'Male'
-            GROUP BY DeveloperType
-      """)
+    val maleResult = spark.sqlContext.sql(selectByGender("Male"))
       .as[DeveloperTypeCount]
       .collect().toList
-    val maleTotal = maleResult.map(_.count).sum
-    val maleLargerThan5a = maleResult.map(v => (v, v.count.toDouble / maleTotal)).filter(_._2 >= 0.05) //.map(_._1)
-    val maleLargerThan5 = maleLargerThan5a.map(_._1)
-    println(s"Male with percentages: ${maleLargerThan5a}")
-    val maleOtherCount = maleResult.map(v => (v, v.count.toDouble / maleTotal)).filter(_._2 < 0.05).map(_._1.count).sum
-//    val maleOtherCount = maleResult.map(v => (v, v.count.toDouble / maleResult.size)).filter(_._2 < 0.05).map(_._1.count).sum
-    val maleOther = DeveloperTypeCount("Other", maleOtherCount)
-    val male = (maleOther :: maleLargerThan5).asJson
+    val male = mergeLess5ToOther(maleResult)
 
     println(s"Males:\n${maleResult}")
     println(s"Females:\n${femaleResult}")
