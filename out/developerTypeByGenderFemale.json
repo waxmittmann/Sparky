@@ -1,15 +1,15 @@
 [
   {
+    "developerType" : "Other",
+    "count" : 21
+  },
+  {
     "developerType" : "Mobile developer",
     "count" : 14
   },
   {
     "developerType" : "NA",
     "count" : 13
-  },
-  {
-    "developerType" : "Graphics programming",
-    "count" : 3
   },
   {
     "developerType" : "Web developer",
@@ -20,43 +20,11 @@
     "count" : 6
   },
   {
-    "developerType" : "Other",
-    "count" : 2
-  },
-  {
     "developerType" : "Desktop applications developer",
     "count" : 10
   },
   {
-    "developerType" : "Embedded applications/devices developer",
-    "count" : 2
-  },
-  {
-    "developerType" : "Systems administrator",
-    "count" : 5
-  },
-  {
     "developerType" : "Database administrator",
     "count" : 8
-  },
-  {
-    "developerType" : "Machine learning specialist",
-    "count" : 1
-  },
-  {
-    "developerType" : "Graphic designer",
-    "count" : 1
-  },
-  {
-    "developerType" : "Quality assurance engineer",
-    "count" : 2
-  },
-  {
-    "developerType" : "Data scientist",
-    "count" : 4
-  },
-  {
-    "developerType" : "DevOps specialist",
-    "count" : 1
   }
 ]
