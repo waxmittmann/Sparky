@@ -1,0 +1,62 @@
+[
+  {
+    "developerType" : "Mobile developer",
+    "count" : 195
+  },
+  {
+    "developerType" : "NA",
+    "count" : 118
+  },
+  {
+    "developerType" : "Graphics programming",
+    "count" : 29
+  },
+  {
+    "developerType" : "Web developer",
+    "count" : 479
+  },
+  {
+    "developerType" : "Developer with a statistics or mathematics background",
+    "count" : 89
+  },
+  {
+    "developerType" : "Other",
+    "count" : 44
+  },
+  {
+    "developerType" : "Desktop applications developer",
+    "count" : 180
+  },
+  {
+    "developerType" : "Embedded applications/devices developer",
+    "count" : 47
+  },
+  {
+    "developerType" : "Systems administrator",
+    "count" : 59
+  },
+  {
+    "developerType" : "Database administrator",
+    "count" : 105
+  },
+  {
+    "developerType" : "Machine learning specialist",
+    "count" : 19
+  },
+  {
+    "developerType" : "Graphic designer",
+    "count" : 31
+  },
+  {
+    "developerType" : "Quality assurance engineer",
+    "count" : 25
+  },
+  {
+    "developerType" : "Data scientist",
+    "count" : 46
+  },
+  {
+    "developerType" : "DevOps specialist",
+    "count" : 57
+  }
+]

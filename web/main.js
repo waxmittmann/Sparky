@@ -4,6 +4,9 @@ import genderData from '../out/jobSatisfactionByGender.json';
 import developerTypeData from '../out/jobSatisfactionByDeveloperTypeJson.json';
 import overpaidData from '../out/overpaid.json';
 
+import developerTypeMenData from '../out/developerTypeByGenderMale.json';
+import developerTypeWomenData from '../out/developerTypeByGenderFemale.json';
+
 var app = new Vue({
   el: '#app',
   data: {
@@ -148,6 +151,29 @@ var overpaid = c3.generate({
     bindto: "#overpaid",
     data: {
         columns: overpaidData.map(x => [x.overpaid, x.count]),
+        type : 'pie',
+        onclick: function (d, i) { console.log("onclick", d, i); },
+        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    }
+});
+
+
+var developerTypeMen = c3.generate({
+    bindto: "#developerTypeMen",
+    data: {
+        columns: developerTypeMenData.map(x => [x.developerType, x.count]),
+        type : 'pie',
+        onclick: function (d, i) { console.log("onclick", d, i); },
+        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    }
+});
+
+var developerTypeWomen = c3.generate({
+    bindto: "#developerTypeWomen",
+    data: {
+        columns: developerTypeWomenData.map(x => [x.developerType, x.count]),
         type : 'pie',
         onclick: function (d, i) { console.log("onclick", d, i); },
         onmouseover: function (d, i) { console.log("onmouseover", d, i); },

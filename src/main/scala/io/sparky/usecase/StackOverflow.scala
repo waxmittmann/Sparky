@@ -214,8 +214,14 @@ case class JobSatisfactionByGender(
   jobSatisfactionTotal: Long
 )
 
+// How easy would it be to generate arbitrary case classes with macros and shapeless?
 case class Overpaid(
   overpaid: String,
+  count: Long
+)
+
+case class DeveloperTypeCount(
+  developerType: String,
   count: Long
 )
 
@@ -224,7 +230,9 @@ object StackOverflow {
   implicit val jobSatisfactionByHoursPerWeekEncoder = deriveEncoder[JobSatisfactionByHoursPerWeek]
   implicit val jobSatisfactionByGenderEncoder = deriveEncoder[JobSatisfactionByGender]
   implicit val jobSatisfactionByDeveloperTypeEncoder = deriveEncoder[JobSatisfactionByDeveloperType]
+//  implicit val developerTypeCountEncoder = deriveEncoder[JobSatisfactionByDeveloperType]
   implicit val overpaidEncoder = deriveEncoder[Overpaid]
+  implicit val developeTypeEncoder = deriveEncoder[DeveloperTypeCount]
 
   val logFile = "/home/damxam/Workspaces/Datasets/survey_results_public.csv"
 
@@ -242,9 +250,10 @@ object StackOverflow {
 
   def run(implicit spark: SparkSession) = {
     val logDataSet = base(logFile)
-    general(logDataSet)
-    jobSatisfaction(logDataSet)
-    overpaid(logDataSet)
+//    general(logDataSet)
+//    jobSatisfaction(logDataSet)
+//    overpaid(logDataSet)
+    developerTypeByGender(logDataSet)
   }
 
   def base(path: String)(implicit spark: SparkSession): DataFrame = {
@@ -315,6 +324,46 @@ object StackOverflow {
       "./out/overpaid.txt",
       overpaid.collect().toList.asJson.spaces2
     )
+  }
+
+
+  def developerTypeByGender(logDataSet: DataFrame)(implicit spark: SparkSession): Unit = {
+    import spark.implicits._
+
+    // By Developer Type
+    val developerTypeByGender: DataFrame = logDataSet
+//      .filter($"Gender".isin("Male", "Female"))
+//      .filter($"Gender".isin("Male"))
+      .select(explode($"DeveloperType").as("DeveloperType"), $"Gender")
+      .withColumn("DeveloperType", trim($"DeveloperType"))
+      .cache()
+//      .filter("count(DeveloperType) > 20")
+//      .groupBy($"Gender")
+//      .agg(count($"DeveloperType"))
+//      .groupBy($"DeveloperType")
+//      .agg(count($"Gender"))
+//      .count()
+
+
+    // Hmm, how could I do this in one go? I think I can see how it'd work with RDDs, so it should? work with sql?
+    val female = developerTypeByGender
+      .filter($"Gender".isin("Female"))
+      .groupBy($"DeveloperType")
+      .agg(count($"Gender"))
+      .select($"count(Gender)".alias("count"), $"DeveloperType")
+      .as[DeveloperTypeCount]
+      .collect().toList.asJson
+
+    val male = developerTypeByGender
+      .filter($"Gender".isin("Male"))
+      .groupBy($"DeveloperType")
+      .agg(count($"Gender"))
+      .select($"count(Gender)".alias("count"), $"DeveloperType")
+      .as[DeveloperTypeCount]
+      .collect().toList.asJson
+
+    write("./out/developerTypeByGenderMale.json", male.spaces2)
+    write("./out/developerTypeByGenderFemale.json", female.spaces2)
   }
 
   def jobSatisfaction(logDataSet: DataFrame)(implicit spark: SparkSession): Unit = {

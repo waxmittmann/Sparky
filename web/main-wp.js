@@ -79,6 +79,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__out_jobSatisfactionByDeveloperTypeJson_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__out_jobSatisfactionByDeveloperTypeJson_json__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__out_overpaid_json__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__out_overpaid_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__out_overpaid_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__out_developerTypeByGenderMale_json__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__out_developerTypeByGenderMale_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__out_developerTypeByGenderMale_json__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__out_developerTypeByGenderFemale_json__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__out_developerTypeByGenderFemale_json___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6__out_developerTypeByGenderFemale_json__);
+
+
+
 
 
 
@@ -236,6 +243,29 @@ var overpaid = c3.generate({
     }
 });
 
+
+var developerTypeMen = c3.generate({
+    bindto: "#developerTypeMen",
+    data: {
+        columns: __WEBPACK_IMPORTED_MODULE_5__out_developerTypeByGenderMale_json___default.a.map(x => [x.developerType, x.count]),
+        type : 'pie',
+        onclick: function (d, i) { console.log("onclick", d, i); },
+        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    }
+});
+
+var developerTypeWomen = c3.generate({
+    bindto: "#developerTypeWomen",
+    data: {
+        columns: __WEBPACK_IMPORTED_MODULE_6__out_developerTypeByGenderFemale_json___default.a.map(x => [x.developerType, x.count]),
+        type : 'pie',
+        onclick: function (d, i) { console.log("onclick", d, i); },
+        onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+        onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+    }
+});
+
 /***/ }),
 /* 1 */
 /***/ (function(module, exports) {
@@ -265,6 +295,18 @@ module.exports = [{"developerType":"NA","jobSatisfactionMean":5.859813084112149,
 /***/ (function(module, exports) {
 
 module.exports = [{"overpaid":"Neither underpaid nor overpaid","count":93},{"overpaid":"Greatly overpaid","count":5},{"overpaid":"Somewhat overpaid","count":21},{"overpaid":"Somewhat underpaid","count":160},{"overpaid":"Greatly underpaid","count":62}]
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+module.exports = [{"developerType":"Mobile developer","count":195},{"developerType":"NA","count":118},{"developerType":"Graphics programming","count":29},{"developerType":"Web developer","count":479},{"developerType":"Developer with a statistics or mathematics background","count":89},{"developerType":"Other","count":44},{"developerType":"Desktop applications developer","count":180},{"developerType":"Embedded applications/devices developer","count":47},{"developerType":"Systems administrator","count":59},{"developerType":"Database administrator","count":105},{"developerType":"Machine learning specialist","count":19},{"developerType":"Graphic designer","count":31},{"developerType":"Quality assurance engineer","count":25},{"developerType":"Data scientist","count":46},{"developerType":"DevOps specialist","count":57}]
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports) {
+
+module.exports = [{"developerType":"Mobile developer","count":14},{"developerType":"NA","count":13},{"developerType":"Graphics programming","count":3},{"developerType":"Web developer","count":43},{"developerType":"Developer with a statistics or mathematics background","count":6},{"developerType":"Other","count":2},{"developerType":"Desktop applications developer","count":10},{"developerType":"Embedded applications/devices developer","count":2},{"developerType":"Systems administrator","count":5},{"developerType":"Database administrator","count":8},{"developerType":"Machine learning specialist","count":1},{"developerType":"Graphic designer","count":1},{"developerType":"Quality assurance engineer","count":2},{"developerType":"Data scientist","count":4},{"developerType":"DevOps specialist","count":1}]
 
 /***/ })
 /******/ ]);
